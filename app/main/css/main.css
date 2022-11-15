@@ -1,0 +1,209 @@
+@font-face {
+    font-family: OpenSans;
+    src: url(../font/OpenSans-Regular.ttf);
+}
+@font-face {
+    font-family: FaSolid;
+    src: url(../font/fa-solid.otf);
+}
+@font-face {
+    font-family: FaBrands;
+    src: url(../font/fa-brands.otf);
+}
+
+* {
+    font-smooth: never;
+    -webkit-font-smoothing : none;
+}
+
+html, * {
+    font-family: OpenSans;
+    background: 0;
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+html {
+    background: transparent;
+}
+
+.nanobar .bar {
+    background: rgb(111, 86, 148);
+}
+
+.container {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.header {
+    color: white;
+    height: 50px;
+    margin-bottom: -1px;
+    width: 100%;
+    background: rgb(7, 2, 14);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+}
+
+.header .title {
+    width: 300px;
+    position: absolute;
+    top: 0px;
+    left: 16px;
+    line-height: 50px;
+    align-self: center;
+    justify-self: center;
+    font-weight: bold;
+}
+
+.buttonbox {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    padding-right: 2%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+
+.buttonbox button {
+    font-weight: bold;
+    font-family: FaSolid;
+    border: none;
+    background: none;
+    height: 30px;
+    width: 30px;
+    color: white;
+    font-size: 25px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+
+.title button {
+    font-weight: bold;
+    font-family: FaSolid;
+    border: none;
+    background: none;
+    height: 30px;
+    width: 30px;
+    color: white;
+    font-size: 25px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+
+button#patreon {
+    margin-top: 10px;
+    font-weight: bold;
+    border: none;
+    background: none;
+    height: 30px;
+    color: white;
+    cursor: pointer;
+    width: 70px;
+    font-size: 10px;
+    font-family: OpenSans;
+}
+
+.bottom-support {
+    text-align: center;
+}
+
+.title button#settings {
+    left: 50px;
+    top: 11px;
+    position:absolute;
+    font-size: 22px;
+}
+
+.title button#home {
+    left: 50px;
+    top: 10px;
+    position:absolute;
+    font-size: 20px;
+}
+
+.main {
+    padding-top: 20px;
+    user-select: none;
+    background: rgb(22, 7, 43);
+    color: white;
+    padding-bottom: 15px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.controls label {
+    text-align: center;
+}
+
+.controls label input {
+    margin-top: 10px;
+}
+
+.game-select {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.footer {
+    margin-top: 10px;
+}
+
+select {
+    appearance: none;
+    border: 0;
+    outline: 0;
+    font-size: 16px;
+    width: 83%;
+    height: 3em;
+    padding: 0 4em 0 1em;
+    background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
+    color: white;
+    border-radius: 0.5em;
+    cursor: pointer;
+}
+  
+select option {
+    color: inherit;
+    background-color: #320a28;
+}
+
+select:focus {
+    outline: none;
+}
+
+.hidden {
+    display: none;
+}
+
+.settings label {
+    margin-left: 55px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.settings label span {
+    font-size: 10px;
+    display: inline-block;
+    vertical-align: top;
+    line-height: 20px;
+    color: rgb(150, 150, 150);
+}
+
+.settings p {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://platform.linkedin.com ">
+        <title>Nook Desktop</title>
+        <link rel="stylesheet" href="css/reset.css" />
+        <link rel="stylesheet" href="css/main.css" />
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+        <script src="js/jquery-3.6.1.min.js" type="text/javascript"></script>
+        <script src="js/nanobar.min.js" type="text/javascript"></script>
+        <script src="js/main.js" defer="" type="text/javascript"></script>
+        <script>if (window.module) module = window.module;</script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <span class="title">nook |
+                    <button id="settings" title="Settings"></button>
+                    <button id="home" class="hidden" title="Home"></button>
+                </span>
+                <div class="buttonbox">
+                    <button id="close" title="Minimize to tray"></button>
+                    <button id="exit" title="Exit Nook"></button>
+                </div>
+            </div>
+            <div class="main">
+                <div class="home page">
+                    <div class="controls">
+                        <label>
+                            Music Volume
+                            <input id="music" type="range" step="1" min="0" max="100" />
+                        </label>
+                        <label>
+                            Rain Volume
+                            <input id="rain" type="range" step="1" min="0" max="100" />
+                        </label>
+                    </div>
+                    <div class="game-select">
+                        <select id="gameSelect">
+                            <option value="population-growing">AC: Population Growing (GC)</option>
+                            <option value="wild-world">AC: City Folk (Wii)</option>
+                            <option value="wild-world-rainy">AC: City Folk (Wii) [Rainy]</option>
+                            <option value="wild-world-snowy">AC: City Folk (Wii) [Snowy]</option>
+                            <option value="new-leaf" selected>AC: New Leaf (3DS)</option>
+                            <option value="new-leaf-rainy">AC: New Leaf (3DS) [Rainy]</option>
+                            <option value="new-leaf-snowy">AC: New Leaf (3DS) [Snowy]</option>
+                            <option value="new-horizons">AC: New Horizons (Switch)</option>
+                            <option value="kk-slider">K.K. Slider</option>
+                            <option value="random">Random</option>
+                        </select>    
+                    </div>
+                </div>
+                <div class="settings page hidden">
+                    <p>player settings</p>
+                    <label>
+                        <input id="grandFather" type="checkbox"/>
+                        Grandfather clock mode <span>(plays once, no loop)</span>
+                    </label>
+                    <label>
+                        <input id="gameWeather" type="checkbox"/>
+                        Use game rain sound
+                    </label>
+                    <label>
+                        <input id="gameWeather" type="checkbox"/>
+                        Use no-thunder rain sound
+                    </label>
+                </div>
+                <div class="bottom-support">
+                    <button id="patreon" title="Support me, opens app creator's Patreon in your browser">patreon</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

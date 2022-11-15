@@ -1,11 +1,11 @@
 {
   "name": "nook-desktop",
   "version": "1.0.0",
-  "description": "",
+  "description": "Nook, desktop version",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron-forge start",
+    "start": "standard && electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
@@ -18,9 +18,11 @@
     "@electron-forge/maker-squirrel": "^6.0.1",
     "@electron-forge/maker-zip": "^6.0.1",
     "electron": "^21.2.3",
-    "electron-reloader": "^1.2.3"
+    "electron-reloader": "^1.2.3",
+    "standard": "^17.0.0"
   },
   "dependencies": {
+    "electron-json-storage": "^4.6.0",
     "electron-squirrel-startup": "^1.0.0"
   }
 }
