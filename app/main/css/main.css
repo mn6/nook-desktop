@@ -38,6 +38,13 @@ html {
 .container {
     border-radius: 10px;
     overflow: hidden;
+    transition: opacity 0.5s;
+    opacity: 0;
+    height: auto;
+}
+
+.visible {
+    opacity: 1;
 }
 
 .header {
@@ -74,6 +81,8 @@ html {
 }
 
 .buttonbox button {
+    text-align: center;
+    padding: 2px;
     font-weight: bold;
     font-family: FaSolid;
     border: none;
@@ -95,6 +104,7 @@ html {
     width: 30px;
     color: white;
     font-size: 25px;
+    padding: 2px;
     cursor: pointer;
     -webkit-app-region: no-drag;
 }
@@ -112,6 +122,57 @@ button#patreon {
     font-family: OpenSans;
 }
 
+button#clearSettings {
+    margin-top: 10px;
+    font-weight: bold;
+    border: none;
+    background: none;
+    height: 30px;
+    color: rgb(253, 76, 76);
+    cursor: pointer;
+    width: 130px;
+    padding: 0;
+    font-size: 10px;
+    font-family: OpenSans;
+}
+
+span.offlineCount {
+    font-size: 12px;
+    display: block;
+    text-align: center;
+    margin-bottom: 7px;
+}
+
+button.download {
+    margin-top: 10px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    height: 30px;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    width: 170px;
+    padding: 0;
+    font-size: 10px;
+    font-family: OpenSans;
+}
+
+.save-tune-btn button {
+    margin-top: 10px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    height: 30px;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    width: 62px;
+    padding: 0;
+    font-size: 10px;
+    font-family: OpenSans;
+}
+
 .bottom-support {
     text-align: center;
 }
@@ -123,11 +184,27 @@ button#patreon {
     font-size: 22px;
 }
 
+.title button#pause {
+    left: 78px;
+    top: 11px;
+    position: absolute;
+    font-size: 21px;
+}
+
 .title button#home {
     left: 50px;
     top: 10px;
     position:absolute;
     font-size: 20px;
+}
+
+.loading {
+    border-radius: 10px;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background: rgb(22, 7, 43);
+    max-height: 226px;
 }
 
 .main {
@@ -136,6 +213,8 @@ button#patreon {
     background: rgb(22, 7, 43);
     color: white;
     padding-bottom: 15px;
+    max-height: 350px;
+    overflow-y: scroll;
 }
 
 .controls {
@@ -169,7 +248,7 @@ select {
     width: 83%;
     height: 3em;
     padding: 0 4em 0 1em;
-    background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
+    background: url(../font/caret.svg) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
     color: white;
     border-radius: 0.5em;
     cursor: pointer;
@@ -180,21 +259,26 @@ select option {
     background-color: #320a28;
 }
 
-select:focus {
-    outline: none;
+*:focus-visible {
+    outline: 2px dashed yellow;
+}
+
+.creator input:focus-visible {
+    outline: 2px dashed yellow;
+    outline-offset: 15px;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .settings label {
-    margin-left: 55px;
+    margin-left: 25px;
     margin-bottom: 5px;
     display: block;
 }
 
-.settings label span {
+.settings label span.tiny {
     font-size: 10px;
     display: inline-block;
     vertical-align: top;
@@ -202,8 +286,553 @@ select:focus {
     color: rgb(150, 150, 150);
 }
 
+.tune-settings p {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
 .settings p {
     text-align: center;
     font-weight: bold;
     margin-bottom: 15px;
+}
+
+.lang-label p {
+    margin-top: -4px;
+    margin-bottom: 2px;
+}
+
+.settings label.lang-label {
+    margin: 0;
+    margin-top: 15px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+.settings label.lang-label select {
+    margin-top: 15px;
+}
+
+.settings p.towntune {
+    margin-top: 15px;
+}
+
+.btnContainer {
+    text-align: center;
+}
+
+.patreon {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+.patreon .head {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.patreon button {
+    margin-left: 5px;
+    text-align: left;
+    font-weight: bold;
+    border: none;
+    background: none;
+    height: 18px;
+    color: rgb(0, 217, 255);
+    cursor: pointer;
+    width: 63px;
+    padding: 0;
+    font-size: 10px;
+    font-family: OpenSans;
+}
+
+.supporters {
+    width: 100%;
+}
+
+.supporters > div {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.384);
+    padding: 5px;
+    margin: auto;
+    margin-top: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 90%;
+}
+
+.supporters p {
+    margin-bottom: 10px;
+}
+
+.gold p {
+    color: gold;
+}
+.silver p {
+    color: rgb(65, 177, 241);
+}
+.bronze p {
+    color: rgb(231, 44, 44);
+}
+
+.supporters ul {
+    margin-left: 25px;
+    margin-right: 25px;
+    list-style-type: none;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 0 2em;
+}
+
+.supporters li {
+    grid-column: span 1;
+    padding-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.towntune-setting {
+    display: flex;
+    align-items: baseline;
+}
+
+button.towntune-custom {
+    border: 0;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: bold;
+    font-size: 11px;
+    margin-left: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+
+.creator {
+    padding-left: 53px;
+    padding-right: 53px;
+    height: 200px;
+    width: auto;
+    margin: auto;
+    background: url('../img/tune_bg.png');
+    background-position: center;
+    background-size:contain;
+    background-repeat: no-repeat;
+}
+
+.creator .inputs {
+    padding-top: 48px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.creator .inputs label {
+    transform: rotate(-90deg);
+}
+
+.creator input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: 24px;
+    margin-bottom: 34px;
+    width: 53px;
+    height: 1px;
+    margin-left: -9px;
+    margin-right: -8px;
+}
+
+.creator input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    background-size: 100% 120%, 170% 100%, 220% 100%;
+}
+
+.creator input[type="range"][c="1"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #adadad 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #adadad 0%, #adadad 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #adadad 0%, #adadad 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="2"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #b471dc 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #b471dc 0%, #b471dc 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #b471dc 0%, #b471dc 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="3"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #ba41db 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #ba41db 0%, #ba41db 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #ba41db 0%, #ba41db 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="4"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #1982d5 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #1982d5 0%, #1982d5 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #1982d5 0%, #1982d5 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="5"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #00aade 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #00aade 0%, #00aade 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #00aade 0%, #00aade 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="6"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #1fcda3 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #1fcda3 0%, #1fcda3 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #1fcda3 0%, #1fcda3 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="7"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #00aa00 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #00aa00 0%, #00aa00 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #00aa00 0%, #00aa00 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="8"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #83c700 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #83c700 0%, #83c700 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #83c700 0%, #83c700 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="9"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #f4c700 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #f4c700 0%, #f4c700 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #f4c700 0%, #f4c700 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="10"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #fea200 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #fea200 0%, #fea200 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #fea200 0%, #fea200 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="11"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #f97400 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #f97400 0%, #f97400 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #f97400 0%, #f97400 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="12"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #ec5c00 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #ec5c00 0%, #ec5c00 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #ec5c00 0%, #ec5c00 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="13"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #df300d 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #df300d 0%, #df300d 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #df300d 0%, #df300d 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="14"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #e23489 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #e23489 0%, #e23489 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #e23489 0%, #e23489 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="15"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #d945aa 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #d945aa 0%, #d945aa 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #d945aa 0%, #d945aa 10%, transparent 11%);
+}
+
+.creator input[type="range"][c="16"]::-webkit-slider-thumb {
+    background-image:
+radial-gradient(ellipse at center, #ff72d2 9px, transparent 10px),
+radial-gradient(ellipse at 22px 13px, #ff72d2 0%, #ff72d2 14%, transparent 15%),
+radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
+}
+
+.creator .blink input ~ span::after {
+    content: '';
+    font-family: FaSolid;
+    position: absolute;
+    vertical-align: middle;
+    top: -21px;
+    left: -2px;
+    text-align: center;
+}
+
+.creator .blink input[c="1"] ~ span::after {
+    left: 6px;
+    top: -22px;
+}
+
+.creator .blink input[c="2"] ~ span::after {
+    top: -15px;
+}
+
+.creator .blink input[c="3"] ~ span::after {
+    top: -22px;
+    left: 1px;
+}
+
+.creator .blink input[c="4"] ~ span::after {
+    top: -20px;
+    left: -1px;
+}
+
+.creator .blink input[c="5"] ~ span::after {
+    top: -20px;
+    left: -1px;
+}
+
+.creator .blink input[c="6"] ~ span::after {
+    top: -20px;
+    left: 0px;
+}
+
+.creator .blink input[c="7"] ~ span::after {
+    top: -20px;
+    left: 0px;
+}
+
+.creator .blink input[c="8"] ~ span::after {
+    top: -20px;
+    left: 0px;
+}
+
+.creator .blink input[c="9"] ~ span::after {
+    top: -20px;
+    left: -1px;
+}
+
+.creator .blink input[c="10"] ~ span::after {
+    top: -20px;
+    left: 1px;
+}
+
+.creator .blink input[c="11"] ~ span::after {
+    top: -20px;
+    left: 0px;
+}
+
+.creator .blink input[c="12"] ~ span::after {
+    top: -20px;
+    left: 0px;
+}
+
+.creator .blink input[c="13"] ~ span::after {
+    top: -21px;
+    left: 0px;
+}
+
+.creator .blink input[c="14"] ~ span::after {
+    top: -20px;
+    left: 0px;
+}
+
+.creator .blink input[c="15"] ~ span::after {
+    top: -20px;
+    left: 0px;
+}
+
+.creator .blink input[c="16"] ~ span::after {
+    top: -21px;
+    left: -2px;
+}
+
+.creator .inputs label input ~ span {
+    z-index: 1;
+    transform: rotate(90deg);
+    position: absolute;
+    top: 20px;
+    pointer-events: none;
+    left: -4px;
+    font-weight: bold;
+    font-size: 15px;
+    color: white;
+    text-shadow: 0 0 4px #000000c7;
+}
+
+
+.creator .inputs label input[c="1"] ~ span {
+    left: -4px;
+}
+.creator .inputs label input[c="1"] ~ span::before {
+    content: 'zZz'
+}
+
+.creator .inputs label input[c="2"] ~ span {
+    left: 12px;
+}
+.creator .inputs label input[c="2"] ~ span::before {
+    content: '_'
+}
+
+.creator .inputs label input[c="3"] ~ span {
+    left: 4px;
+}
+.creator .inputs label input[c="3"] ~ span::before {
+    content: 'G'
+}
+
+.creator .inputs label input[c="4"] ~ span {
+    left: 7px;
+    top: 21px;
+}
+.creator .inputs label input[c="4"] ~ span::before {
+    content: 'A'
+}
+
+.creator .inputs label input[c="5"] ~ span {
+    left: 8px;
+    top: 21px;
+}
+.creator .inputs label input[c="5"] ~ span::before {
+    content: 'B'
+}
+
+.creator .inputs label input[c="6"] ~ span {
+    left: 9px;
+}
+.creator .inputs label input[c="6"] ~ span::before {
+    content: 'C'
+}
+
+.creator .inputs label input[c="7"] ~ span {
+    left: 10px;
+    top: 21px;
+}
+.creator .inputs label input[c="7"] ~ span::before {
+    content: 'D'
+}
+
+.creator .inputs label input[c="8"] ~ span {
+    left: 13px;
+}
+.creator .inputs label input[c="8"] ~ span::before {
+    content: 'E'
+}
+
+.creator .inputs label input[c="9"] ~ span {
+    left: 14px;
+}
+.creator .inputs label input[c="9"] ~ span::before {
+    content: 'F'
+}
+
+.creator .inputs label input[c="10"] ~ span {
+    left: 15px;
+}
+.creator .inputs label input[c="10"] ~ span::before {
+    content: 'G'
+}
+
+.creator .inputs label input[c="11"] ~ span {
+    left: 17px;
+}
+.creator .inputs label input[c="11"] ~ span::before {
+    content: 'A'
+}
+
+.creator .inputs label input[c="12"] ~ span {
+    left: 19px;
+}
+.creator .inputs label input[c="12"] ~ span::before {
+    content: 'B'
+}
+
+.creator .inputs label input[c="13"] ~ span {
+    left: 19px;
+}
+.creator .inputs label input[c="13"] ~ span::before {
+    content: 'C'
+}
+
+.creator .inputs label input[c="14"] ~ span {
+    left: 21px;
+    top: 21px;
+}
+.creator .inputs label input[c="14"] ~ span::before {
+    content: 'D'
+}
+
+.creator .inputs label input[c="15"] ~ span {
+    left: 24px;
+}
+.creator .inputs label input[c="15"] ~ span::before {
+    content: 'E'
+}
+
+.creator .inputs label input[c="16"] ~ span {
+    left: 26px;
+    top: 21px;
+}
+.creator .inputs label input[c="16"] ~ span::before {
+    content: '?'
+}
+
+.error {
+    position: absolute;
+    z-index: 1;
+    background: #481919;
+    color: white;
+    width: 100%;
+    height: auto;
+    top: -50px;
+    left: 0px;
+    display: flex;
+    font-weight: bold;
+    overflow-wrap: break-word;
+    border-bottom: 1px solid white;
+    transition: top 0.2s ease 0.5s;
+}
+
+.error p {
+    text-align: center;
+    align-self: center;
+}
+
+.error div {
+    margin: auto;
+    padding: 16px 18px;
+}
+
+.show-error {
+    top: 0px;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: 0;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(253, 253, 253);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(175, 175, 175);
 }

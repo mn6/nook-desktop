@@ -2,15 +2,20 @@ const { app, BrowserWindow, Tray, nativeImage, Menu, ipcMain, shell } = require(
 
 const storage = require('electron-json-storage')
 const path = require('path')
+const fs = require('fs')
 
 const userSettingsPath = path.join(app.getPath('userData'), 'userSettings') // change path for userSettings
 storage.setDataPath(userSettingsPath)
+
+const progress = (win, num) => {
+  win.webContents.send('toWindow', ['bar', num])
+}
 
 const createWindow = () => {
   let tray
   const win = new BrowserWindow({
     width: 400,
-    height: 400,
+    height: 500,
     autoHideMenuBar: true,
     transparent: true,
     frame: false,
@@ -73,7 +78,7 @@ const createWindow = () => {
   const hiddenWin = new BrowserWindow({
     width: 500,
     height: 500,
-    show: false,
+    show: true,
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
@@ -92,6 +97,17 @@ const createWindow = () => {
 
   ipcMain.on('toWindow', (event, args) => {
     win.webContents.send('toWindow', args)
+  })
+
+  ipcMain.addListener('clearSettings', async (event) => {
+    progress(win, 1)
+    await new Promise((resolve) => storage.clear(err => resolve(err)))
+    progress(win, 50)
+    await new Promise((resolve) => fs.rm(userSettingsPath + '/sound', { recursive: true, force: true }, err => resolve(err)))
+    progress(win, 100)
+
+    app.relaunch()
+    app.exit()
   })
 }
 

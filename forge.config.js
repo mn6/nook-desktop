@@ -1,6 +1,7 @@
 module.exports = {
   packagerConfig: {
-    icon: './icons/nook'
+    icon: './icons/nook',
+    name: 'Nook Desktop'
   },
   rebuildConfig: {},
   makers: [

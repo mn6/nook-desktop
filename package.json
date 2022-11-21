@@ -23,6 +23,14 @@
   },
   "dependencies": {
     "electron-json-storage": "^4.6.0",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "fs": "^0.0.1-security",
+    "superagent": "^8.0.3"
+  },
+  "standard": {
+    "ignore": [
+      "howler.min.js",
+      "wad.js"
+    ]
   }
 }
