@@ -13,11 +13,21 @@ const translations = {
   es: require('./i18n/Nook_Spanish.json')
 }
 
+const kkSongs = require('../kk.json')
+const kkHtml = () => {
+  let res = ''
+  kkSongs.forEach(song => {
+    res += `<label><input type="checkbox" class="kkSong" data-title="${song}" />${song}</label>`
+  })
+
+  return res
+}
+
 const replaceDataInit = {
   offlineKKFiles: 0,
   offlineFiles: 0,
-  totalKKFiles: 152,
-  totalFiles: 192
+  totalKKFiles: 193,
+  totalFiles: 292
 }
 
 const replaceDataObs = {
@@ -82,6 +92,8 @@ const template = `
           <div class="game-select">
               <select id="gameSelect">
                   <option value="population-growing" data-i18n="AC: Population Growing (GC)"></option>
+                  <option value="population-growing-snowy" data-i18n="AC: Population Growing (GC) [Snowy]"></option>
+                  <option value="population-growing-cherry" data-i18n="AC: Population Growing (GC) [Sakura]"></option>
                   <option value="wild-world" data-i18n="AC: City Folk (Wii)"></option>
                   <option value="wild-world-rainy" data-i18n="AC: City Folk (Wii) [Rainy]"></option>
                   <option value="wild-world-snowy" data-i18n="AC: City Folk (Wii) [Snowy]">}</option>
@@ -89,6 +101,11 @@ const template = `
                   <option value="new-leaf-rainy" data-i18n="AC: New Leaf (3DS) [Rainy]"></option>
                   <option value="new-leaf-snowy" data-i18n="AC: New Leaf (3DS) [Snowy]"></option>
                   <option value="new-horizons" data-i18n="AC: New Horizons (Switch)"></option>
+                  <option value="new-horizons-rainy" data-i18n="AC: New Horizons (Switch) [Rainy]"></option>
+                  <option value="new-horizons-snowy" data-i18n="AC: New Horizons (Switch) [Snowy]"></option>
+                  <option value="pocket-camp" data-i18n="AC: Pocket Camp (Mobile)"></option>
+                  <optgroup label="&nbsp;"></optgroup>
+                  <option value="kk-slider-desktop" data-i18n="K.K. Slider"></option>
                   <option value="random" data-i18n="Random"></option>
               </select>    
           </div>
@@ -115,7 +132,14 @@ const template = `
                 <input id="townTune" type="checkbox"/>
                 <span data-i18n="Enable town tune"></span>
             </label>
-            <button data-i18n="customize" id="towntune_customize" class="towntune-custom"></button>
+          </div>
+          <label class="kk-label">
+            <input id="kkSaturday" type="checkbox"/>
+            <span data-i18n="Play K.K. music on Saturday nights"></span>
+          </label>
+          <div class="btnContainer">
+            <button id="kkCustomize" data-i18n="customize k.k. playlist"></button>
+            <button class="towntune-custom" id="towntune_customize" data-i18n="customize town tune"></button>
           </div>
           <label class="lang-label">
             <p data-i18n="language"></p>
@@ -128,15 +152,28 @@ const template = `
                 </option>
               </select>
           </label>
-          <p data-i18n="offline"></p>
+          <p class="offline" data-i18n="offline"></p>
           <span class="offlineCount" data-i18n="{{offlineFiles}}/{{totalFiles}} offline hourly music files downloaded"></span>
           <span class="offlineCount" data-i18n="{{offlineKKFiles}}/{{totalKKFiles}} offline k.k. music files downloaded"></span>
           <div class="btnContainer">
             <button class="download" id="downloadHourly" data-i18n="download all hourly music" data-i18n-alt="downloading..."></button>
-            <button class="download" id="downloadKK" data-i18n="download all k.k. music"></button>
+            <button class="download" id="downloadKK" data-i18n="download all k.k. music" data-i18n-alt="downloading..."></button>
           </div>
           <div class="btnContainer">
               <button id="clearSettings" data-i18n="clear local files and settings"></button>
+          </div>
+      </div>
+      <div class="kk-customize page hidden">
+          <p data-i18n="k.k. playlist"></p>
+          <div class="kk-btn btnContainer">
+            <button id="save_kk" data-i18n="save" data-i18n-alt="saved!"></button>
+            <button id="check_kk" data-i18n="check all"></button>
+            <button id="uncheck_kk" data-i18n="uncheck all"></button>
+            <button id="radio_kk" data-i18n="radio only"></button>
+            <button id="live_kk" data-i18n="live only"></button>
+          </div>
+          <div class="playlist">
+            ${kkHtml()}
           </div>
       </div>
       <div class="tune-settings page hidden">
@@ -299,6 +336,12 @@ const changeLang = (lang, manual, arg) => {
       $('#gameSelect').val(arg.game)
       $('#langSelect').val(arg.lang)
       $('#townTune').prop('checked', arg.tuneEnabled)
+      $('#kkSaturday').prop('checked', arg.kkSaturday)
+
+      arg.kkEnabled.forEach((song) => {
+        $(`.kk-customize input[data-title="${song}"]`).prop('checked', true)
+      })
+
       paused = arg.paused
       pause(arg.paused)
 
@@ -342,6 +385,14 @@ const exec = () => {
   $('#towntune_customize').on('click', () => {
     $('.page').addClass('hidden')
     $('.tune-settings.page').removeClass('hidden')
+
+    $('#home').addClass('hidden')
+    $('#settings').removeClass('hidden').focus()
+  })
+
+  $('#kkCustomize').on('click', () => {
+    $('.page').addClass('hidden')
+    $('.kk-customize.page').removeClass('hidden')
 
     $('#home').addClass('hidden')
     $('#settings').removeClass('hidden').focus()
@@ -393,6 +444,10 @@ const exec = () => {
     ipc.send('toPlayer', ['tuneEnabled', e.target.checked])
   })
 
+  $('.settings #kkSaturday').on('change', (e) => {
+    ipc.send('toPlayer', ['kkSaturday', e.target.checked])
+  })
+
   $('.settings #langSelect').on('change', (e) => {
     changeLang(e.target.value, true)
   })
@@ -406,6 +461,46 @@ const exec = () => {
     $(e.currentTarget).text(i18n($(e.currentTarget).attr('data-i18n-alt')))
     $('.settings .download').attr('disabled', 'true')
     ipc.send('toPlayer', ['downloadHourly'])
+  })
+
+  $('.settings #downloadKK').on('click', async (e) => {
+    $(e.currentTarget).text(i18n($(e.currentTarget).attr('data-i18n-alt')))
+    $('.settings .download').attr('disabled', 'true')
+    ipc.send('toPlayer', ['downloadKK'])
+  })
+
+  $('.kk-customize #save_kk').on('click', (e) => {
+    const list = []
+    $('.kk-customize input').each((i, e) => {
+      if ($(e).prop('checked') === true) {
+        list.push($(e).attr('data-title'))
+      }
+    })
+
+    ipc.send('toPlayer', ['kkEnabled', list])
+
+    $(e.currentTarget).text(i18n($(e.currentTarget).attr('data-i18n-alt')))
+    setTimeout(() => {
+      $(e.currentTarget).text(i18n($(e.currentTarget).attr('data-i18n')))
+    }, 1000)
+  })
+
+  $('.kk-customize #check_kk').on('click', () => {
+    $('.kk-customize input').prop('checked', true)
+  })
+
+  $('.kk-customize #uncheck_kk').on('click', () => {
+    $('.kk-customize input').prop('checked', false)
+  })
+
+  $('.kk-customize #live_kk').on('click', () => {
+    $('.kk-customize label').not(':contains(Radio)').find('input').prop('checked', true)
+    $('.kk-customize label').filter(':contains(Radio)').find('input').prop('checked', false)
+  })
+
+  $('.kk-customize #radio_kk').on('click', () => {
+    $('.kk-customize label').filter(':contains(Radio)').find('input').prop('checked', true)
+    $('.kk-customize label').not(':contains(Radio)').find('input').prop('checked', false)
   })
 
   $('.tune-settings input[type="range"]').on('wheel', e => {
@@ -497,6 +592,8 @@ $(document).ready(() => {
     } else if (arg[0] === 'downloadDoneAll') {
       $('.settings .download').attr('disabled', 'false')
       $('.settings #downloadHourly').text(i18n($('.settings #downloadHourly').attr('data-i18n')))
+      $('.settings .download').attr('disabled', 'false')
+      $('.settings #downloadKK').text(i18n($('.settings #downloadKK').attr('data-i18n')))
     } else if (arg[0] === 'patreon') {
       const template = '<li title="{{fill}}">{{fill}}</li>'
       Object.entries(arg[1]).forEach(thing => {
@@ -504,6 +601,8 @@ $(document).ready(() => {
           $(`.${thing[0]} ul`).append(template.replaceAll('{{fill}}', name))
         })
       })
+    } else if (arg[0] === 'updateGame') {
+      $('#gameSelect').val(arg[1])
     }
   })
 })

@@ -143,6 +143,21 @@ span.offlineCount {
     margin-bottom: 7px;
 }
 
+.playlist {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.playlist label {
+    width: 46%;
+    font-size: 13px;
+    padding-left: 15px;
+}
+
+p.offline {
+    margin-top: 25px;
+}
+
 button.download {
     margin-top: 10px;
     font-weight: bold;
@@ -171,6 +186,26 @@ button.download {
     padding: 0;
     font-size: 10px;
     font-family: OpenSans;
+}
+
+.kk-btn button {
+    margin-top: 10px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    height: 30px;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    width: 67px;
+    padding: 0;
+    font-size: 10px;
+    font-family: OpenSans;
+}
+
+.kk-btn.btnContainer {
+    margin-bottom: 13px;
+    margin-top: -9px;
 }
 
 .bottom-support {
@@ -258,6 +293,11 @@ select option {
     color: inherit;
     background-color: #320a28;
 }
+  
+select optgroup {
+    color: inherit;
+    background-color: #320a28;
+}
 
 *:focus-visible {
     outline: 2px dashed yellow;
@@ -292,15 +332,29 @@ select option {
     margin-bottom: 15px;
 }
 
+.kk-customize p {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
 .settings p {
     text-align: center;
     font-weight: bold;
     margin-bottom: 15px;
 }
 
+.settings p.kk-settings {
+    margin-top: 12px;
+}
+
+.kk-label + .btnContainer {
+    margin-top: 15px;
+}
+
 .lang-label p {
-    margin-top: -4px;
-    margin-bottom: 2px;
+    margin-top: 20px;
+    margin-bottom: 5px;
 }
 
 .settings label.lang-label {
@@ -405,6 +459,18 @@ select option {
 }
 
 button.towntune-custom {
+    border: 0;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: bold;
+    font-size: 11px;
+    margin-left: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+
+button#kkCustomize {
     border: 0;
     border-radius: 5px;
     background: rgba(255, 255, 255, 0.3);

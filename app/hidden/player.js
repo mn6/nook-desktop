@@ -28,6 +28,8 @@ let beepTimeout
 let paused
 let gameRain
 let peacefulRain
+let kkEnabled
+let kkSaturday
 
 const tunes = [
   'G0',
@@ -60,8 +62,9 @@ const tunesBeepMap = [
   'E6'
 ]
 const games = [
-  'population-growing', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons'
+  'population-growing', 'population-growing-snowy', 'population-growing-cherry', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons', 'new-horizons-rainy', 'new-horizons-snowy', 'pocket-camp'
 ]
+const kkSongs = require('../kk.json')
 
 const getHour = () => {
   const d = new Date()
@@ -80,16 +83,17 @@ const unloadSound = async () => {
   rainSound = null
 }
 
-const handleClock = async () => {
+const handleClock = async (kk = false) => {
   return await new Promise(resolve => {
     if (paused) {
       unloadSound()
       return resolve()
     }
     const playSound = async () => {
+      const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
       sound = new Howl({
-        src: [await getUrl(`${baseUrl}/${game === 'random' ? games[~~(Math.random() * games.length)] : game}/${hour}.ogg`)],
-        loop: true,
+        src: [await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`)],
+        loop: gameUrl !== 'kk-slider-desktop',
         volume: 0
       })
 
@@ -114,10 +118,27 @@ const handleClock = async () => {
 
         resolve('sound loaded')
       })
+
+      sound.on('end', async () => {
+        if (game === 'kk-slider-desktop' && !grandFather) {
+          hour = null
+          await handleClock(true)
+        }
+      })
     }
     const newHour = getHour()
 
-    if (hour !== newHour) {
+    if ((hour !== newHour) || kk) {
+      if (kkSaturday && ~['8pm', '9pm', '10pm', '11pm'].indexOf(newHour) && (new Date().getDay() === 6)) {
+        game = 'kk-slider-desktop'
+        ipc.send('toWindow', ['updateGame', game])
+      }
+      if (kkSaturday && (newHour === '12am') && (new Date().getDay() === 6)) {
+        game = storage.getSync('game').game || 'new-leaf'
+        ipc.send('toWindow', ['updateGame', game])
+      }
+
+      const diffHour = hour !== newHour
       const oldHour = hour
       hour = newHour
       clearTimeout(fadeTimeout)
@@ -128,7 +149,7 @@ const handleClock = async () => {
 
           await unloadSound()
 
-          await playChime(tuneEnabled && oldHour !== null)
+          if (diffHour) await playChime(tuneEnabled && ((oldHour !== null) || kk))
 
           playSound()
         })
@@ -160,6 +181,8 @@ const doMain = () => {
   paused = storage.getSync('paused').paused
   gameRain = storage.getSync('gameRain').enabled
   peacefulRain = storage.getSync('peacefulRain').enabled
+  kkEnabled = storage.getSync('kkEnabled').songs
+  kkSaturday = storage.getSync('kkSaturday').enabled
 
   offlineFiles = keys.filter(e => e.includes('meta-') && !e.includes('meta-kk-slider') && !e.includes('meta-rain')).length
   offlineKKFiles = keys.filter(e => e.includes('meta-kk-slider')).length
@@ -173,6 +196,8 @@ const doMain = () => {
   if (tuneEnabled === undefined) tuneEnabled = true
   if (gameRain === undefined) gameRain = false
   if (peacefulRain === undefined) peacefulRain = false
+  if (kkEnabled === undefined) kkEnabled = kkSongs
+  if (kkSaturday === undefined) kkSaturday = false
   if (tune === undefined) {
     tune = [
       'G1',
@@ -194,7 +219,7 @@ const doMain = () => {
     ]
   }
 
-  ipc.send('toWindow', ['configs', { soundVol, rainVol, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, paused, gameRain, peacefulRain }])
+  ipc.send('toWindow', ['configs', { soundVol, rainVol, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, paused, gameRain, peacefulRain, kkEnabled, kkSaturday }])
 
   superagent
     .get('https://cms.mat.dog/getSupporters')
@@ -397,6 +422,8 @@ const handleIpc = (event, arg) => {
     }
   } else if (command === 'downloadHourly') {
     downloadHourly()
+  } else if (command === 'downloadKK') {
+    downloadKK()
   } else if (command === 'gameRain') {
     gameRain = arg[0]
     peacefulRain = false
@@ -409,21 +436,43 @@ const handleIpc = (event, arg) => {
     storage.set('peacefulRain', { enabled: arg[0] })
     storage.set('gameRain', { enabled: false })
     replayRain()
+  } else if (command === 'kkEnabled') {
+    kkEnabled = arg[0]
+    storage.set('kkEnabled', { songs: arg[0] })
+    if (game === 'kk-slider-desktop') {
+      replay()
+    }
+  } else if (command === 'kkSaturday') {
+    kkSaturday = arg[0]
+    storage.set('kkSaturday', { enabled: arg[0] })
   }
+}
+
+const hourToPocketCamp = (hour) => {
+  const morning = ['5am', '6am', '7am', '8am']
+  const day = ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm']
+  const evening = ['5pm', '6pm']
+  const night = ['7pm', '8pm', '9pm', '10pm', '11pm', '12am', '1am', '2am', '3am', '4am']
+
+  if (~morning.indexOf(hour)) return 'morning'
+  if (~day.indexOf(hour)) return 'day'
+  if (~evening.indexOf(hour)) return 'evening'
+  if (~night.indexOf(hour)) return 'night'
 }
 
 const downloadHourly = async () => {
   let total = 0
   let errs = 0
-  const increment = 100 / (games.length * 24)
+  const increment = 100 / (((games.length - 1) * 24) + 4) // + 4 is pocket camp
   const hours = ['12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm']
+  const pcHours = ['morning', 'day', 'evening', 'night']
   let delay = 1000
   let stop = false
   for (const g of games) {
     if (stop) return
     await new Promise(resolve => {
       setTimeout(async () => {
-        for (let i = 0; i < 24; i++) {
+        for (let i = 0; i < (g === 'pocket-camp' ? 4 : 24); i++) {
           if (errs >= 3) {
             stop = true
             ipc.send('toWindow', ['error', 'failedToDownload'])
@@ -432,8 +481,8 @@ const downloadHourly = async () => {
           }
 
           await new Promise(resolve => setTimeout(() => resolve(), delay))
-          const oldUrl = `${baseUrl}/${g}/${hours[i]}.ogg`
-          const newUrl = toNewUrl(`${baseUrl}/${g}/${hours[i]}.ogg`)
+          const oldUrl = `${baseUrl}/${g}/${g === 'pocket-camp' ? pcHours[i] : hours[i]}.ogg`
+          const newUrl = toNewUrl(oldUrl)
           const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
           if (lastModified) {
             delay = 0
@@ -449,10 +498,50 @@ const downloadHourly = async () => {
           total += increment
           progress(total)
 
-          if (i === 23) {
+          if ((g === 'pocket-camp' && i === 3) || (i === 23)) {
             resolve()
           }
         }
+      }, 0)
+    })
+  }
+
+  ipc.send('toWindow', ['downloadDoneAll'])
+  progress(100)
+}
+
+const downloadKK = async () => {
+  let total = 0
+  let errs = 0
+  const increment = 100 / kkSongs.length
+  let delay = 1000
+  for (const s of kkSongs) {
+    if (errs >= 3) {
+      ipc.send('toWindow', ['error', 'failedToDownload'])
+      break
+    }
+    await new Promise(resolve => {
+      setTimeout(async () => {
+        await new Promise(resolve => setTimeout(() => resolve(), delay))
+
+        const oldUrl = `${baseUrl}/kk-slider-desktop/${s}.ogg`
+        console.log(oldUrl)
+        const newUrl = toNewUrl(oldUrl)
+        const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
+        if (lastModified) {
+          delay = 0
+        } else {
+          delay = 1000
+          const res = await localSave(oldUrl, newUrl, lastModified)
+
+          if (res === 'err') {
+            errs++
+          }
+        }
+
+        total += increment
+        progress(total)
+        resolve()
       }, 0)
     })
   }
