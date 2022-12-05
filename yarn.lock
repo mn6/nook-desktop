@@ -877,6 +877,11 @@
     "rimraf" "^2.5.1"
     "write-file-atomic" "^2.4.2"
 
+"electron-log@^4.4.8":
+  "integrity" "sha512-QQ4GvrXO+HkgqqEOYbi+DHL7hj5JM+nHi/j+qrN9zeeXVKy8ZABgbu4CnG+BBqDZ2+tbeq9tUC4DZfIWFU5AZA=="
+  "resolved" "https://registry.npmjs.org/electron-log/-/electron-log-4.4.8.tgz"
+  "version" "4.4.8"
+
 "electron-osx-sign@^0.6.0":
   "integrity" "sha512-+hiIEb2Xxk6eDKJ2FFlpofCnemCbjbT5jz+BKGpVBrRNT3kWTGs4DfNX6IzGwgi33hUcXF+kFs9JW+r6Wc1LRg=="
   "resolved" "https://registry.npmjs.org/electron-osx-sign/-/electron-osx-sign-0.6.0.tgz"
