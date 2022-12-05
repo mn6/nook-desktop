@@ -78,7 +78,7 @@ const createWindow = () => {
   const hiddenWin = new BrowserWindow({
     width: 500,
     height: 500,
-    show: true,
+    show: false,
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
@@ -116,7 +116,3 @@ app.disableHardwareAcceleration()
 app.whenReady().then(() => {
   createWindow()
 })
-
-try {
-  require('electron-reloader')(module)
-} catch (_) {}

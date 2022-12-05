@@ -5,27 +5,48 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "standard && electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "pack": "electron-builder --dir",
+    "dist": "env-cmd electron-builder"
   },
-  "author": "",
+  "author": "mn6",
   "license": "ISC",
+  "build": {
+    "productName": "Nook",
+    "appId": "com.mn6.nookdesktop",
+    "mac": {
+      "artifactName": "${productName}Setup.${ext}",
+      "category": "public.app-category.music"
+    },
+    "win": {
+      "artifactName": "${productName}Setup.${ext}",
+      "icon": "build/icons/nook.png",
+      "target": [
+        "nsis-web"
+      ]
+    }
+  },
+  "publish": {
+    "provider": "github"
+  },
+  "nsis": {
+    "installerIcon": "build/icons/nook.png",
+    "uninstallerIcon": "build/icons/nook.png",
+    "artifactName": "${productName}Setup.${ext}"
+  },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.1",
-    "@electron-forge/maker-deb": "^6.0.1",
-    "@electron-forge/maker-rpm": "^6.0.1",
-    "@electron-forge/maker-squirrel": "^6.0.1",
-    "@electron-forge/maker-zip": "^6.0.1",
     "electron": "^21.2.3",
-    "electron-reloader": "^1.2.3",
+    "electron-builder": "^23.6.0",
     "standard": "^17.0.0"
   },
   "dependencies": {
+    "@analytics/google-analytics": "^1.0.5",
+    "analytics": "^0.8.1",
     "electron-json-storage": "^4.6.0",
-    "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^5.3.0",
+    "env-cmd": "^10.1.0",
     "fs": "^0.0.1-security",
-    "superagent": "^8.0.3"
+    "superagent": "^8.0.3",
+    "uuid": "^9.0.0"
   },
   "standard": {
     "ignore": [

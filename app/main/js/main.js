@@ -1,11 +1,15 @@
+const request = require('superagent')
+const uuid = require('uuid')
 const ipc = require('electron').ipcRenderer
 const $ = window.jQuery
 const Nanobar = window.Nanobar
 const CustomEvent = window.CustomEvent
 const confirm = window.confirm
+const u = uuid.v4()
 let i18n
 let blinkers
 let paused = false
+let language = 'en'
 
 // Load translations here
 const translations = {
@@ -68,8 +72,8 @@ const template = `
   <div class="error"><div></div></div>
   <div class="header">
       <span class="title">nook |
-          <button id="settings" data-i18n-title="Settings"></button>
-          <button id="home" class="hidden" data-i18n-title="Home"></button>
+          <button id="settings" data-i18n-title="Settings" role="link"></button>
+          <button id="home" class="hidden" data-i18n-title="Home" role="link"></button>
           <button id="pause" data-i18n-title="Pause" data-i18n-title-alt="Play"></button>
       </span>
       <div class="buttonbox">
@@ -114,7 +118,7 @@ const template = `
           </div>
       </div>
       <div class="settings page hidden">
-          <p data-i18n="player settings"></p>
+          <p data-i18n="player settings" role="heading" aria-level="1"></p>
           <label>
               <input id="grandFather" type="checkbox"/>
               <span data-i18n="Grandfather clock mode"></span> <span class="tiny" data-i18n="(plays once, no loop)"></span>
@@ -156,7 +160,7 @@ const template = `
                 </option>
               </select>
           </label>
-          <p class="offline" data-i18n="offline"></p>
+          <p class="offline" data-i18n="offline" role="heading" aria-level="2"></p>
           <span class="offlineCount" data-i18n="{{offlineFiles}}/{{totalFiles}} offline hourly music files downloaded"></span>
           <span class="offlineCount" data-i18n="{{offlineKKFiles}}/{{totalKKFiles}} offline k.k. music files downloaded"></span>
           <div class="btnContainer">
@@ -168,7 +172,7 @@ const template = `
           </div>
       </div>
       <div class="kk-customize page hidden">
-          <p data-i18n="k.k. playlist"></p>
+          <p data-i18n="k.k. playlist" role="heading" aria-level="1"></p>
           <div class="kk-btn btnContainer">
             <button id="save_kk" data-i18n="save" data-i18n-alt="saved!"></button>
             <button id="check_kk" data-i18n="check all"></button>
@@ -181,7 +185,7 @@ const template = `
           </div>
       </div>
       <div class="tune-settings page hidden">
-          <p data-i18n="tune settings"></p>
+          <p data-i18n="tune settings" role="heading" aria-level="1"></p>
           <div class="creator">
             <div class="inputs">
               <label>
@@ -250,6 +254,9 @@ const template = `
               </label>
             </div>
           </div>
+          <div class="tips">
+            <p data-i18n="tip: you can use the mouse wheel to adjust notes!"></p>
+          </div>
           <div class="save-tune-btn btnContainer">
             <button id="save_tune" data-i18n="save" data-i18n-alt="saved!"></button>
             <button id="play_tune" data-i18n="play" data-i18n-alt="playing..."></button>
@@ -257,22 +264,22 @@ const template = `
       </div>
       <div class="patreon page hidden">
           <div class="head">
-              <p data-i18n="patreon supporters"></p>
+              <p data-i18n="patreon supporters" role="heading" aria-level="1"></p>
               <button id="supportme" data-i18n="(support me!)" data-i18n-title="Opens developer's Patreon page"></button>
           </div>
           <div class="supporters">
               <div class="gold">
-                  <p data-i18n="gold supporters"></p>
+                  <p data-i18n="gold supporters" role="heading" aria-level="2"></p>
                   <ul>
                   </ul>
               </div>
               <div class="silver">
-                  <p data-i18n="silver supporters"></p>
+                  <p data-i18n="silver supporters" role="heading" aria-level="2"></p>
                   <ul>
                   </ul>
               </div>
               <div class="bronze">
-                  <p data-i18n="bronze supporters"></p>
+                  <p data-i18n="bronze supporters" role="heading" aria-level="2"></p>
                   <ul>
                   </ul>
               </div>
@@ -296,6 +303,7 @@ const pause = (state) => {
 }
 
 const changeLang = (lang, manual, arg) => {
+  language = lang
   i18n = key => {
     let t = translations[lang][key]
     if (!t) {
@@ -359,7 +367,39 @@ const changeLang = (lang, manual, arg) => {
   }
 }
 
+const logVis = (page) => {
+  request
+    .post('https://www.google-analytics.com/mp/collect')
+    .query({
+      api_secret: 'V8GvDmXcQmWaAM6HGa0nDg',
+      measurement_id: 'G-3Y8P169K9E'
+    })
+    .send(JSON.stringify({
+      client_id: u,
+      user_properties: {
+        language: {
+          value: language
+        }
+      },
+      events: [
+        {
+          name: 'page_view',
+          params: {
+            page_title: page,
+            page_location: `https://mat.dog/nook/${page}`,
+            engagement_time_msec: '5',
+            session_id: u
+          }
+        }
+      ]
+    }))
+    .then(() => {})
+    .catch(() => {})
+}
+
 const exec = () => {
+  logVis('home')
+
   $('#close').on('click', () => {
     ipc.send('min')
   })
@@ -376,10 +416,13 @@ const exec = () => {
   })
 
   $('.patreon #supportme').on('click', (e) => {
+    logVis('patreonLink')
     ipc.send('patreon')
   })
 
   $('#patreon').on('click', () => {
+    logVis('patreon')
+
     $('.page').addClass('hidden')
     $('.patreon.page').removeClass('hidden')
 
@@ -388,6 +431,7 @@ const exec = () => {
   })
 
   $('#towntune_customize').on('click', () => {
+    logVis('towntune')
     $('.page').addClass('hidden')
     $('.tune-settings.page').removeClass('hidden')
 
@@ -396,6 +440,7 @@ const exec = () => {
   })
 
   $('#kkCustomize').on('click', () => {
+    logVis('kkCustomize')
     $('.page').addClass('hidden')
     $('.kk-customize.page').removeClass('hidden')
 
@@ -416,6 +461,7 @@ const exec = () => {
   })
 
   $('#settings').on('click', () => {
+    logVis('settings')
     $('.page').addClass('hidden')
     $('.settings.page').removeClass('hidden')
 
@@ -424,6 +470,7 @@ const exec = () => {
   })
 
   $('#home').on('click', () => {
+    logVis('home')
     $('.page').addClass('hidden')
     $('.home.page').removeClass('hidden')
 
