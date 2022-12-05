@@ -1,6 +1,6 @@
 {
   "name": "nook-desktop",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Nook desktop",
   "main": "index.js",
   "scripts": {
