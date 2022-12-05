@@ -18,3 +18,9 @@
     <li>Random mode</li>
     <li>All K.K. songs released</li>
 </ul>
+
+<p>TODO:</p>
+<ul>
+  <li>Afford a windows certificate so there's no dodgy installation process</li>
+  <li>Afford a macOS certificate and create a macOS build</li>
+</ul>
