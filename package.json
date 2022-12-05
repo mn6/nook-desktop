@@ -1,12 +1,13 @@
 {
   "name": "nook-desktop",
-  "version": "1.0.0",
-  "description": "Nook, desktop version",
+  "version": "1.0.1",
+  "description": "Nook desktop",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pack": "electron-builder --dir",
-    "dist": "env-cmd electron-builder"
+    "dist": "env-cmd electron-builder",
+    "release": "env-cmd electron-builder"
   },
   "author": "mn6",
   "license": "ISC",

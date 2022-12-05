@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Tray, nativeImage, Menu, ipcMain, shell } = require('electron')
+const { autoUpdater } = require('electron-updater')
 
 const storage = require('electron-json-storage')
 const path = require('path')
@@ -116,3 +117,5 @@ app.disableHardwareAcceleration()
 app.whenReady().then(() => {
   createWindow()
 })
+
+autoUpdater.checkForUpdatesAndNotify()
