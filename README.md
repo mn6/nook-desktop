@@ -1,4 +1,4 @@
-# nook-desktop (WIP)
+# Nook Desktop
 
 <p align="center">
   <img alt="nook desktop promotional" src="https://i.imgur.com/NnNdJ0d.png" />
