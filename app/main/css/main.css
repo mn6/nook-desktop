@@ -279,11 +279,11 @@ select {
     appearance: none;
     border: 0;
     outline: 0;
-    font-size: 16px;
-    width: 83%;
+    font-size: 14px;
+    width: 79%;
     height: 3em;
     padding: 0 4em 0 1em;
-    background: url(../font/caret.svg) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
+    background: url(../font/caret.svg) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, rgb(255 255 255 / 9%) 3em, rgb(255 255 255 / 5%) 3em);
     color: white;
     border-radius: 0.5em;
     cursor: pointer;
@@ -869,6 +869,7 @@ radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
     overflow-wrap: break-word;
     border-bottom: 1px solid white;
     transition: top 0.2s ease 0.5s;
+    border-radius: 8px;
 }
 
 .error p {

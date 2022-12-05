@@ -127,6 +127,10 @@ const template = `
               <input class="rains" id="peacefulRain" type="checkbox"/>
               <span data-i18n="Use no-thunder rain sound"></span>
           </label>
+          <label>
+              <input id="preferNoDownload" type="checkbox"/>
+              <span data-i18n="Don't download music"></span> <span class="tiny" data-i18n="(saves space, but no offline)"></span>
+          </label>
           <div class="towntune-setting">
             <label>
                 <input id="townTune" type="checkbox"/>
@@ -336,6 +340,7 @@ const changeLang = (lang, manual, arg) => {
       $('#gameSelect').val(arg.game)
       $('#langSelect').val(arg.lang)
       $('#townTune').prop('checked', arg.tuneEnabled)
+      $('#preferNoDownload').prop('checked', arg.preferNoDownload)
       $('#kkSaturday').prop('checked', arg.kkSaturday)
 
       arg.kkEnabled.forEach((song) => {
@@ -444,12 +449,17 @@ const exec = () => {
     ipc.send('toPlayer', ['tuneEnabled', e.target.checked])
   })
 
+  $('.settings #preferNoDownload').on('change', (e) => {
+    ipc.send('toPlayer', ['preferNoDownload', e.target.checked])
+  })
+
   $('.settings #kkSaturday').on('change', (e) => {
     ipc.send('toPlayer', ['kkSaturday', e.target.checked])
   })
 
   $('.settings #langSelect').on('change', (e) => {
     changeLang(e.target.value, true)
+    ipc.send('toPlayer', ['lang', e.target.value])
   })
 
   $('.settings #clearSettings').on('click', async (e) => {
@@ -514,6 +524,10 @@ const exec = () => {
     e.currentTarget.dispatchEvent(new CustomEvent('input'))
   })
 
+  $('.tune-settings input[type="range"]').on('click', e => {
+    e.currentTarget.dispatchEvent(new CustomEvent('input'))
+  })
+
   $('.tune-settings input[type="range"]').on('input', e => {
     const el = $(e.currentTarget)
     ipc.send('toPlayer', ['playNote', el.val()])
@@ -556,7 +570,7 @@ const exec = () => {
 }
 
 const showErr = (err) => {
-  $('.error div').html(i18n(err)).parent().addClass('show-error')
+  $('.error div').html(err).parent().addClass('show-error')
   setTimeout(() => {
     $('.error').removeClass('show-error')
   }, 4000)
@@ -589,10 +603,15 @@ $(document).ready(() => {
       } else {
         replaceData.offlineFiles++
       }
+    } else if (arg[0] === 'downloadRemoved') {
+      if (arg[1] === 'kk') {
+        replaceData.offlineKKFiles--
+      } else {
+        replaceData.offlineFiles--
+      }
     } else if (arg[0] === 'downloadDoneAll') {
-      $('.settings .download').attr('disabled', 'false')
+      $('.settings .download').removeAttr('disabled')
       $('.settings #downloadHourly').text(i18n($('.settings #downloadHourly').attr('data-i18n')))
-      $('.settings .download').attr('disabled', 'false')
       $('.settings #downloadKK').text(i18n($('.settings #downloadKK').attr('data-i18n')))
     } else if (arg[0] === 'patreon') {
       const template = '<li title="{{fill}}">{{fill}}</li>'

@@ -46,5 +46,21 @@
     "failedToLoadRainSound": "no se pudo cargar el sonido de la lluvia.",
     "Play": "Reproducir",
     "Pause": "Pausar",
-    "failedToDownload": "no se pudo descargar la música."
+    "failedToDownload": "no se pudo descargar la música.",
+    "AC: Population Growing (GC) [Snowy]": "AC: Población: ¡en aumento! (GC) [Nevando]",
+    "AC: Population Growing (GC) [Sakura]": "AC: Población: ¡en aumento! (GC) [Sakura]",
+    "AC: New Horizons (Switch) [Rainy]": "AC: New Horizons (Switch) [Lloviendo]",
+    "AC: New Horizons (Switch) [Snowy]": "AC: New Horizons (Switch) [Nevando]",
+    "AC: Pocket Camp (Mobile)": "AC: Pocket Camp (Móvil)",
+    "Play K.K. music on Saturday nights": "Tocar música K.K. sábados por la noche",
+    "customize k.k. playlist": "personalizar la lista de k.k.",
+    "customize town tune": "personalizar la melodía de la ciudad",
+    "k.k. playlist": "lista de k.k.",
+    "check all": "marque todas",
+    "uncheck all": "desmarque todas",
+    "radio only": "solo radio",
+    "live only": "solo en vivo",
+    "downloading...": "descargando...",
+    "Don't download music": "No descargar",
+    "(saves space, but no offline)": "(ahorra espacio, fuera de linea no funcionará)"
 }

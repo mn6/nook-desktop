@@ -3,19 +3,23 @@ const storage = require('electron-json-storage')
 const fs = require('fs')
 const superagent = require('superagent')
 const Wad = window.Wad
+const AudioContext = window.AudioContext
+const kkSongs = require('../kk.json')
 
+const baseUrl = 'https://d17orwheorv96d.cloudfront.net'
 let chime
 let beep
-const baseUrl = 'https://d17orwheorv96d.cloudfront.net'
-const Howl = window.Howl
 let sound
 let soundVol
+let soundSources = []
+let soundGain
+let rain
 let rainVol
-let rainSound
+let rainSources = []
+let rainGain
 let game
-let grandFather
+let grandFather = false
 let hour
-let fadeTimeout
 let chimeInt
 let userSettingsPath
 let lang
@@ -25,11 +29,12 @@ let offlineKKFiles
 let tune
 let tuneEnabled
 let beepTimeout
-let paused
+let paused = false
 let gameRain
 let peacefulRain
 let kkEnabled
 let kkSaturday
+let preferNoDownload
 
 const tunes = [
   'G0',
@@ -64,71 +69,175 @@ const tunesBeepMap = [
 const games = [
   'population-growing', 'population-growing-snowy', 'population-growing-cherry', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons', 'new-horizons-rainy', 'new-horizons-snowy', 'pocket-camp'
 ]
-const kkSongs = require('../kk.json')
 
-const getHour = () => {
-  const d = new Date()
-  const hrs = d.getHours()
-  return `${(hrs + 24) % 12 || 12}${hrs >= 12 ? 'pm' : 'am'}`
-}
-
-const progress = num => {
-  ipc.send('toWindow', ['bar', num])
-}
-
-const unloadSound = async () => {
-  if (sound) await sound.unload()
-  if (rainSound) await rainSound.unload()
-  sound = null
-  rainSound = null
-}
-
-const handleClock = async (kk = false) => {
-  return await new Promise(resolve => {
+const soundLoaded = async (a, isSound = true) => {
+  return new Promise(async resolve => {
     if (paused) {
-      unloadSound()
-      return resolve()
+      resolve()
+    } else {
+      if (isSound) {
+        sound = a
+        sound.isSound = isSound
+        sound.start()
+        await fadeSound('sound', true)
+      } else {
+        rain = a
+        rain.start()
+        await fadeSound('rain', true)
+      }
+      resolve()
     }
-    const playSound = async () => {
-      const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
-      sound = new Howl({
-        src: [await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`)],
-        loop: gameUrl !== 'kk-slider-desktop',
-        volume: 0
-      })
+  })
+}
 
-      sound.on('load', () => {
-        progress(100)
-        if (grandFather) {
-        // Let song play twice (some songs are really short)
-          const dur = sound.duration()
-          fadeTimeout = setTimeout(() => {
-            sound.on('fade', () => {
-              unloadSound()
-            })
-            sound.fade(soundVol / 100, 0, 1000)
-            clearTimeout(fadeTimeout)
-          }, ((dur * 1000) * 2) - 1100)
+const startAudio = async () => {
+  hour = null
+  paused = false
+  return timeCheck()
+}
+
+const stopAudio = async (mode = 'sound') => {
+  return new Promise(async resolve => {
+    if (mode === 'rain' || mode === 'all') {
+      if (!rain) {
+        resolve('skip stop')
+      } else {
+        await fadeSound('rain', false)
+        if (rain) {
+          rain.stop()
+          rain = null
+          for (const s of rainSources) {
+            try { s.stop() } catch (err) {}
+          }
+          rainSources = []
         }
-
+        if (mode === 'rain') resolve('stopped')
+      }
+    }
+    if (mode === 'sound' || mode === 'all') {
+      if (!sound) {
+        resolve('skip stop')
+      } else {
+        await fadeSound('sound', false)
         if (sound) {
-          sound.play()
-          sound.fade(0, soundVol / 100, 1000)
+          sound.removeEventListener('ended', kkEnded)
+          sound.stop()
+          sound = null
+          for (const s of soundSources) {
+            try { s.stop() } catch (err) {}
+          }
+          soundSources = []
         }
+        resolve('stopped')
+      }
+    }
+  })
+}
 
-        resolve('sound loaded')
-      })
+const pauseClicked = async () => {
+  if (!paused) {
+    paused = true
+    await stopAudio('all')
+    return 'done'
+  } else {
+    paused = false
+    playRain()
+    await startAudio()
+    return 'done'
+  }
+}
 
-      sound.on('end', async () => {
-        if (game === 'kk-slider-desktop' && !grandFather) {
-          hour = null
-          await handleClock(true)
-        }
+const fadeSound = async (mode = 'sound', fadeIn = true) => {
+  return new Promise(async resolve => {
+    for (let i = 0; i <= (mode === 'sound' ? (soundVol * 100) : (rainVol * 100)); i += 1) {
+      await new Promise(resolve => setTimeout(resolve, 2))
+      if ((fadeIn && (mode === 'sound' ? sound : rain)) || !fadeIn) {
+        if (mode === 'sound') soundGain.gain.value = fadeIn ? (i / 100) : (soundVol - (i / 100))
+        if (mode === 'rain') rainGain.gain.value = fadeIn ? (i / 100) : (rainVol - (i / 100))
+      } else {
+        resolve('skip')
+      }
+
+      if ((fadeIn && (i / 100) === (mode === 'sound' ? soundVol : rainVol)) || (!fadeIn && ((mode === 'sound' ? soundGain.gain.value : rainGain.gain.value) === 0))) {
+        resolve('done')
+      }
+    }
+  })
+}
+
+const playSound = async url => {
+  console.log('playing ', url)
+  if (!url) return
+  const context = new AudioContext()
+  const audioBuffer = await fetch(url)
+    .then(res => res.arrayBuffer())
+    .then(ArrayBuffer => context.decodeAudioData(ArrayBuffer))
+    .catch(err => console.error(err))
+
+  if (!audioBuffer) {
+    if (preferNoDownload) {
+      ipc.send('toWindow', ['error', 'failedToLoadSound'])
+    } else {
+      // Delete corrupted file if it exists
+      fs.unlink(url, err => {
+        console.error(err)
+        storage.remove(`meta-${url.split('/sound/')[1].replace('.ogg', '')}`)
+        ipc.send('toWindow', ['downloadRemoved', url.includes('kk-slider') ? 'kk' : 'hourly'])
+        ipc.send('toWindow', ['error', 'failedToLoadSound'])
       })
     }
-    const newHour = getHour()
+  } else {
+    const source = context.createBufferSource()
+    soundSources.push(source)
+    source.buffer = audioBuffer
+    soundGain = context.createGain()
+    soundGain.gain.value = 0
+    source.connect(soundGain).connect(context.destination)
+    source.loop = !grandFather && game !== 'kk-slider-desktop'
+    if (game === 'kk-slider-desktop') {
+      source.addEventListener('ended', kkEnded)
+    }
 
-    if ((hour !== newHour) || kk) {
+    await soundLoaded(source, true)
+  }
+}
+
+const kkEnded = () => {
+  hour = null
+  timeCheck()
+}
+
+const playRain = async () => {
+  const url = await getUrl(`${baseUrl}/rain/${gameRain ? 'game-rain' : peacefulRain ? 'no-thunder-rain' : 'rain'}.ogg`)
+  if (!url) return
+  const context = new AudioContext()
+  const source = context.createBufferSource()
+  rainSources.push(source)
+  const audioBuffer = await fetch(url)
+    .then(res => res.arrayBuffer())
+    .then(ArrayBuffer => context.decodeAudioData(ArrayBuffer))
+    .catch(err => console.error(err))
+
+  source.buffer = audioBuffer
+  rainGain = context.createGain()
+  rainGain.gain.value = 0
+  source.connect(rainGain).connect(context.destination)
+  source.loop = !grandFather
+
+  await soundLoaded(source, false)
+}
+
+const timeCheck = async () => {
+  return new Promise(async resolve => {
+    const newHour = getHour()
+    if (paused || newHour === hour) {
+      resolve('paused || grandFather || newHour === hour')
+    } else {
+      await stopAudio('sound')
+      // Play town tune here
+      if (hour && hour !== newHour) await playChime(tuneEnabled)
+      hour = newHour
+
       if (kkSaturday && ~['8pm', '9pm', '10pm', '11pm'].indexOf(newHour) && (new Date().getDay() === 6)) {
         game = 'kk-slider-desktop'
         ipc.send('toWindow', ['updateGame', game])
@@ -138,35 +247,205 @@ const handleClock = async (kk = false) => {
         ipc.send('toWindow', ['updateGame', game])
       }
 
-      const diffHour = hour !== newHour
-      const oldHour = hour
-      hour = newHour
-      clearTimeout(fadeTimeout)
-
-      if (sound) {
-        sound.on('fade', async () => {
-          progress(50)
-
-          await unloadSound()
-
-          if (diffHour) await playChime(tuneEnabled && ((oldHour !== null) || kk))
-
-          playSound()
-        })
-        sound.fade(soundVol / 100, 0, 1000)
-      } else {
-        playSound()
-        replayRain()
-      }
-    } else {
-      resolve('hour same')
+      const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
+      await playSound(await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`))
+      resolve('played')
     }
   })
 }
 
-const timeHandler = () => {
-  setInterval(() => {
-    handleClock()
+const toNewUrl = oldUrl => {
+  let newUrl = oldUrl.split('/')
+  newUrl = `${newUrl[newUrl.length - 2]}-${newUrl[newUrl.length - 1]}`.replace('.ogg', '')
+  return newUrl
+}
+
+const getUrl = async (oldUrl) => {
+  const newUrl = toNewUrl(oldUrl)
+  const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
+  const s = await localSave(oldUrl, newUrl, lastModified)
+
+  if (s === 'err' || s === 'head fail' || s === 'no headers error') {
+    if (newUrl.includes('rain-')) {
+      ipc.send('toWindow', ['error', 'failedToLoadRainSound'])
+    } else {
+      ipc.send('toWindow', ['error', 'failedToLoadSound'])
+    }
+
+    return ''
+  }
+
+  if (s === 'prefer no download') {
+    return oldUrl
+  }
+
+  return `${userSettingsPath}/sound/${newUrl}.ogg`
+}
+
+const handleIpc = async (event, arg) => {
+  const command = arg[0]
+  arg.shift()
+
+  if (command === 'userSettingsPath') {
+    userSettingsPath = arg[0]
+    storage.setDataPath(arg[0])
+    storage.keys((err, k) => {
+      if (!err) keys = k
+      else keys = []
+      doMain()
+    })
+  } else if (command === 'musicVol') {
+    soundGain.gain.value = +arg[0] / 100
+    chime.setVolume(+arg[0] / 100)
+    soundVol = +arg[0] / 100
+    storage.set('soundVol', { volume: +arg[0] })
+  } else if (command === 'rainVol') {
+    rainGain.gain.value = +arg[0] / 100
+    rainVol = +arg[0] / 100
+    storage.set('rainVol', { volume: +arg[0] })
+  } else if (command === 'grandFather') {
+    grandFather = arg[0]
+    storage.set('grandFather', { enabled: arg[0] })
+    const newHour = getHour()
+    hour = newHour
+    const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
+    await stopAudio('sound')
+    await playSound(await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`))
+  } else if (command === 'game') {
+    game = arg[0]
+    storage.set('game', { game })
+    const newHour = getHour()
+    hour = newHour
+    const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
+    await stopAudio('sound')
+    await playSound(await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`))
+  } else if (command === 'tuneEnabled') {
+    tuneEnabled = arg[0]
+    storage.set('tuneEnabled', { tuneEnabled: arg[0] })
+  } else if (command === 'preferNoDownload') {
+    preferNoDownload = arg[0]
+    storage.set('preferNoDownload', { preferNoDownload: arg[0] })
+  } else if (command === 'tune') {
+    tune = arg[0]
+    storage.set('tune', { tune })
+  } else if (command === 'playNote') {
+    await playBeep(arg[0], 350)
+  } else if (command === 'playTune') {
+    await playBeeps(arg[0])
+  } else if (command === 'paused') {
+    storage.set('paused', { paused: arg[0] })
+    pauseClicked()
+  } else if (command === 'downloadHourly') {
+    await downloadHourly()
+  } else if (command === 'downloadKK') {
+    await downloadKK()
+  } else if (command === 'gameRain') {
+    gameRain = arg[0]
+    peacefulRain = false
+    storage.set('gameRain', { enabled: arg[0] })
+    storage.set('peacefulRain', { enabled: false })
+    await stopAudio('rain')
+    await playRain()
+  } else if (command === 'peacefulRain') {
+    peacefulRain = arg[0]
+    gameRain = false
+    storage.set('peacefulRain', { enabled: arg[0] })
+    storage.set('gameRain', { enabled: false })
+    await stopAudio('rain')
+    await playRain()
+  } else if (command === 'kkEnabled') {
+    kkEnabled = arg[0]
+    storage.set('kkEnabled', { songs: arg[0] })
+    if (game === 'kk-slider-desktop') {
+      const newHour = getHour()
+      hour = newHour
+      const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
+      await stopAudio('sound')
+      await playSound(await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`))
+    }
+  } else if (command === 'kkSaturday') {
+    kkSaturday = arg[0]
+    storage.set('kkSaturday', { enabled: arg[0] })
+    const newHour = getHour()
+    hour = newHour
+    const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
+    await stopAudio('sound')
+    await playSound(await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`))
+  } else if (command === 'lang') {
+    lang = arg[0]
+    storage.set('lang', { lang: arg[0] })
+  }
+}
+
+const localSave = async (oldUrl, newUrl, lastModified) => {
+  return await new Promise(resolve => {
+    if (preferNoDownload) {
+      resolve('prefer no download')
+    } else {
+      // Check HEAD first
+      superagent
+        .head(oldUrl)
+        .then(res => {
+          if (res.headers && res.headers['last-modified']) {
+            if (!lastModified) lastModified = 0
+            if (+new Date(lastModified) !== +new Date(res.headers['last-modified'])) {
+              // Download
+              superagent
+                .get(oldUrl)
+                .then(res => {
+                  if (res.body && userSettingsPath) {
+                    fs.mkdir(userSettingsPath + '/sound', { recursive: true }, err => {
+                      if (err) return
+                      const ws = fs.createWriteStream(`${userSettingsPath}/sound/${newUrl}.ogg`)
+                      ws.write(res.body, 'binary')
+                      ws.end()
+                      ws.on('finish', () => {
+                        storage.set(`meta-${newUrl}`, { lastModified: res.headers['last-modified'] })
+                        ipc.send('toWindow', ['downloadDone', newUrl.includes('kk-slider') ? 'kk' : 'hourly'])
+                        resolve('good!')
+                      })
+                      ws.on('error', err => {
+                        resolve('err')
+                        console.error(err)
+                      })
+                    })
+                  }
+                })
+                .catch(err => {
+                  resolve('err')
+                  console.error(err)
+                })
+            } else {
+              resolve('already obtained')
+            }
+          } else {
+            resolve('no headers err')
+          }
+        })
+        .catch(err => {
+          resolve('head fail')
+          console.error(err)
+        })
+    }
+  })
+}
+
+const progress = num => {
+  ipc.send('toWindow', ['bar', num])
+}
+
+const getHour = () => {
+  const d = new Date()
+  const hrs = d.getHours()
+  return `${(hrs + 24) % 12 || 12}${hrs >= 12 ? 'pm' : 'am'}`
+}
+
+const doTick = async () => {
+  if (!paused) {
+    await timeCheck()
+  }
+  setTimeout(() => {
+    doTick()
   }, 5000)
 }
 
@@ -177,6 +456,7 @@ const doMain = () => {
   game = storage.getSync('game').game
   lang = storage.getSync('lang').lang
   tuneEnabled = storage.getSync('tuneEnabled').tuneEnabled
+  preferNoDownload = storage.getSync('preferNoDownload').preferNoDownload
   tune = storage.getSync('tune').tune
   paused = storage.getSync('paused').paused
   gameRain = storage.getSync('gameRain').enabled
@@ -188,12 +468,15 @@ const doMain = () => {
   offlineKKFiles = keys.filter(e => e.includes('meta-kk-slider')).length
 
   if (paused === undefined) paused = false
-  if (soundVol === undefined) soundVol = 50
-  if (rainVol === undefined) rainVol = 50
+  if (soundVol === undefined) soundVol = 0.50
+  else soundVol = soundVol / 100
+  if (rainVol === undefined) rainVol = 0.50
+  else rainVol = rainVol / 100
   if (grandFather === undefined) grandFather = false
   if (game === undefined) game = 'new-leaf'
   if (lang === undefined) lang = 'en'
   if (tuneEnabled === undefined) tuneEnabled = true
+  if (preferNoDownload === undefined) preferNoDownload = false
   if (gameRain === undefined) gameRain = false
   if (peacefulRain === undefined) peacefulRain = false
   if (kkEnabled === undefined) kkEnabled = kkSongs
@@ -219,7 +502,7 @@ const doMain = () => {
     ]
   }
 
-  ipc.send('toWindow', ['configs', { soundVol, rainVol, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, paused, gameRain, peacefulRain, kkEnabled, kkSaturday }])
+  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday }])
 
   superagent
     .get('https://cms.mat.dog/getSupporters')
@@ -246,7 +529,7 @@ const doMain = () => {
       D2: [44, 48],
       E2: [48, 52]
     },
-    volume: soundVol / 100
+    volume: soundVol
   })
   beep = new Wad({
     source: 'triangle',
@@ -256,196 +539,9 @@ const doMain = () => {
   })
 
   setTimeout(async () => {
-    if (paused) return
-
-    await replayRain()
-    await handleClock()
-    timeHandler()
+    await playRain()
+    doTick()
   }, 0)
-}
-
-const toNewUrl = oldUrl => {
-  let newUrl = oldUrl.split('/')
-  newUrl = `${newUrl[newUrl.length - 2]}-${newUrl[newUrl.length - 1]}`.replace('.ogg', '')
-  return newUrl
-}
-
-const getUrl = async (oldUrl) => {
-  const newUrl = toNewUrl(oldUrl)
-  const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
-  const s = await localSave(oldUrl, newUrl, lastModified)
-
-  if (!lastModified) {
-    if (s === 'err' || s === 'head fail' || s === 'no headers error') {
-      if (newUrl.includes('rain-')) {
-        ipc.send('toWindow', ['error', 'failedToLoadRainSound'])
-      } else {
-        ipc.send('toWindow', ['error', 'failedToLoadSound'])
-        await unloadSound()
-      }
-
-      return ''
-    }
-  }
-
-  return `${userSettingsPath}/sound/${newUrl}.ogg`
-}
-
-const localSave = async (oldUrl, newUrl, lastModified) => {
-  return await new Promise(resolve => {
-    // Check HEAD first
-    superagent
-      .head(oldUrl)
-      .then(res => {
-        if (res.headers && res.headers['last-modified']) {
-          if (!lastModified) lastModified = 0
-          if (+new Date(lastModified) !== +new Date(res.headers['last-modified'])) {
-            // Download
-            superagent
-              .get(oldUrl)
-              .then(res => {
-                if (res.body && userSettingsPath) {
-                  fs.mkdir(userSettingsPath + '/sound', { recursive: true }, err => {
-                    if (err) return
-                    const ws = fs.createWriteStream(`${userSettingsPath}/sound/${newUrl}.ogg`)
-                    ws.write(res.body, 'binary')
-                    ws.end()
-                    ws.on('finish', () => {
-                      storage.set(`meta-${newUrl}`, { lastModified: res.headers['last-modified'] })
-                      ipc.send('toWindow', ['downloadDone', newUrl.includes('kk-slider') ? 'kk' : 'hourly'])
-                      resolve('good!')
-                    })
-                    ws.on('error', err => {
-                      resolve('err')
-                      console.error(err)
-                    })
-                  })
-                }
-              })
-              .catch(err => {
-                resolve('err')
-                console.error(err)
-              })
-          } else {
-            resolve('already obtained')
-          }
-        } else {
-          resolve('no headers err')
-        }
-      })
-      .catch(err => {
-        resolve('head fail')
-        console.error(err)
-      })
-  })
-}
-
-const replay = async () => {
-  hour = null
-  await handleClock()
-  await replayRain()
-}
-
-const replayRain = async () => {
-  const setupRain = async () => {
-    if (rainSound) {
-      await rainSound.unload()
-      rainSound = null
-    }
-    rainSound = new Howl({
-      src: [await getUrl(`${baseUrl}/rain/${gameRain ? 'game-rain' : peacefulRain ? 'no-thunder-rain' : 'rain'}.ogg`)],
-      loop: true,
-      volume: 0
-    })
-
-    rainSound.on('load', () => {
-      progress(100)
-      if (rainSound) {
-        rainSound.play()
-        rainSound.fade(0, rainVol / 100, 1000)
-      }
-    })
-  }
-
-  await setupRain()
-}
-
-const handleIpc = (event, arg) => {
-  const command = arg[0]
-  arg.shift()
-
-  if (command === 'userSettingsPath') {
-    userSettingsPath = arg[0]
-    storage.setDataPath(arg[0])
-    storage.keys((err, k) => {
-      if (!err) keys = k
-      else keys = []
-      doMain()
-    })
-  } else if (command === 'musicVol') {
-    if (sound) sound.volume(+arg[0] / 100)
-    soundVol = +arg[0]
-    storage.set('soundVol', { volume: +arg[0] })
-  } else if (command === 'rainVol') {
-    if (rainSound) rainSound.volume(+arg[0] / 100)
-    rainVol = +arg[0]
-    storage.set('rainVol', { volume: +arg[0] })
-  } else if (command === 'grandFather') {
-    grandFather = arg[0]
-    storage.set('grandFather', { enabled: arg[0] })
-    replay()
-  } else if (command === 'game') {
-    game = arg[0]
-    storage.set('game', { game })
-    replay()
-  } else if (command === 'tuneEnabled') {
-    tuneEnabled = arg[0]
-    storage.set('tuneEnabled', { tuneEnabled: arg[0] })
-  } else if (command === 'tune') {
-    tune = arg[0]
-    storage.set('tune', { tune })
-  } else if (command === 'playNote') {
-    setTimeout(async () => {
-      await playBeep(arg[0], 350)
-    }, 0)
-  } else if (command === 'playTune') {
-    setTimeout(async () => {
-      await playBeeps(arg[0])
-    }, 0)
-  } else if (command === 'paused') {
-    paused = arg[0]
-    storage.set('paused', { paused: arg[0] })
-    if (!paused) {
-      replay()
-    } else {
-      unloadSound()
-    }
-  } else if (command === 'downloadHourly') {
-    downloadHourly()
-  } else if (command === 'downloadKK') {
-    downloadKK()
-  } else if (command === 'gameRain') {
-    gameRain = arg[0]
-    peacefulRain = false
-    storage.set('gameRain', { enabled: arg[0] })
-    storage.set('peacefulRain', { enabled: false })
-    replayRain()
-  } else if (command === 'peacefulRain') {
-    peacefulRain = arg[0]
-    gameRain = false
-    storage.set('peacefulRain', { enabled: arg[0] })
-    storage.set('gameRain', { enabled: false })
-    replayRain()
-  } else if (command === 'kkEnabled') {
-    kkEnabled = arg[0]
-    storage.set('kkEnabled', { songs: arg[0] })
-    if (game === 'kk-slider-desktop') {
-      replay()
-    }
-  } else if (command === 'kkSaturday') {
-    kkSaturday = arg[0]
-    storage.set('kkSaturday', { enabled: arg[0] })
-  }
 }
 
 const hourToPocketCamp = (hour) => {
@@ -525,7 +621,6 @@ const downloadKK = async () => {
         await new Promise(resolve => setTimeout(() => resolve(), delay))
 
         const oldUrl = `${baseUrl}/kk-slider-desktop/${s}.ogg`
-        console.log(oldUrl)
         const newUrl = toNewUrl(oldUrl)
         const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
         if (lastModified) {
@@ -562,11 +657,20 @@ const playChime = async (play) => {
       }
       i++
       if (i === tune.length) {
+        fadeAndStopChime()
         resolve('done')
         clearInterval(chimeInt)
       }
     }, 900)
   })
+}
+
+const fadeAndStopChime = async () => {
+  for (let i = (soundVol * 100); i >= 0; i--) {
+    await new Promise(resolve => setTimeout(() => resolve(), 5))
+    chime.setVolume(i / 100)
+  }
+  chime.stop()
 }
 
 const playBeeps = async (beeps) => {
@@ -613,13 +717,6 @@ const playBeep = async (note, delay) => {
     }
   })
 }
-
-// const stopChime = async () => {
-//   return await new Promise(resolve => {
-//     clearInterval(chimeInt)
-//     chime.stop()
-//   })
-// }
 
 ipc.on('toPlayer', handleIpc)
 ipc.send('playerLoaded')

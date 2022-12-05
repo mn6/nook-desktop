@@ -46,5 +46,21 @@
     "failedToLoadRainSound": "failed to load rain sound.",
     "Play": "Play",
     "Pause": "Pause",
-    "failedToDownload": "failed to download music."
+    "failedToDownload": "failed to download music.",
+    "AC: Population Growing (GC) [Snowy]": "AC: Population Growing (GC) [Snowy]",
+    "AC: Population Growing (GC) [Sakura]": "AC: Population Growing (GC) [Sakura]",
+    "AC: New Horizons (Switch) [Rainy]": "AC: New Horizons (Switch) [Rainy]",
+    "AC: New Horizons (Switch) [Snowy]": "AC: New Horizons (Switch) [Snowy]",
+    "AC: Pocket Camp (Mobile)": "AC: Pocket Camp (Mobile)",
+    "Play K.K. music on Saturday nights": "Play K.K. music on Saturday nights",
+    "customize k.k. playlist": "customize k.k. playlist",
+    "customize town tune": "customize town tune",
+    "k.k. playlist": "k.k. playlist",
+    "check all": "check all",
+    "uncheck all": "uncheck all",
+    "radio only": "radio only",
+    "live only": "live only",
+    "downloading...": "downloading...",
+    "Don't download music": "Don't download music",
+    "(saves space, but no offline)": "(saves space, but no offline)"
 }
