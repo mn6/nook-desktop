@@ -888,6 +888,13 @@ radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
     padding: 16px 18px;
 }
 
+#openGithub {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-app-region: none;
+}
+
 .show-error {
     top: 0px;
 }

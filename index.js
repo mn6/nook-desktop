@@ -1,5 +1,4 @@
 const { app, BrowserWindow, Tray, nativeImage, Menu, ipcMain, shell } = require('electron')
-const { autoUpdater } = require('electron-updater')
 
 const storage = require('electron-json-storage')
 const path = require('path')
@@ -7,6 +6,8 @@ const fs = require('fs')
 
 const userSettingsPath = path.join(app.getPath('userData'), 'userSettings') // change path for userSettings
 storage.setDataPath(userSettingsPath)
+
+const { autoUpdater } = require('electron-updater')
 
 const progress = (win, num) => {
   win.webContents.send('toWindow', ['bar', num])
@@ -71,6 +72,9 @@ const createWindow = () => {
 
   ipcMain.addListener('patreon', () => {
     shell.openExternal('https://www.patreon.com/mattu')
+  })
+  ipcMain.addListener('github', () => {
+    shell.openExternal('https://github.com/mn6/nook-desktop')
   })
 
   ipcMain.addListener('min', close)

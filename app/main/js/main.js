@@ -71,7 +71,7 @@ const template = `
 <div class="container overlay">
   <div class="error"><div></div></div>
   <div class="header">
-      <span class="title">nook |
+      <span class="title"><span id="openGithub" role="link" data-i18n-title="Nook GitHub">nook</span> |
           <button id="settings" data-i18n-title="Settings" role="link"></button>
           <button id="home" class="hidden" data-i18n-title="Home" role="link"></button>
           <button id="pause" data-i18n-title="Pause" data-i18n-title-alt="Play"></button>
@@ -418,6 +418,11 @@ const exec = () => {
   $('.patreon #supportme').on('click', (e) => {
     logVis('patreonLink')
     ipc.send('patreon')
+  })
+
+  $('.title #openGithub').on('click', (e) => {
+    logVis('github')
+    ipc.send('github')
   })
 
   $('#patreon').on('click', () => {

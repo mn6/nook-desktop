@@ -1,11 +1,11 @@
 {
   "name": "nook-desktop",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Nook desktop",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "standard && node index.js",
+    "start": "standard && electron .",
     "pack": "electron-builder --dir",
     "dist": "env-cmd electron-builder",
     "release": "env-cmd electron-builder"
@@ -17,6 +17,8 @@
     "appId": "com.mn6.nookdesktop",
     "mac": {
       "artifactName": "${productName}Setup.${ext}",
+      "icon": "build/icons/nook.icns",
+      "target": [ "dmg" ],
       "category": "public.app-category.music"
     },
     "win": {
