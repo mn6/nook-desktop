@@ -1,0 +1,80 @@
+{
+  "name": "nook-desktop",
+  "version": "1.0.6",
+  "description": "Nook desktop",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "standard --fix && electron .",
+    "pack": "electron-builder --dir",
+    "dist": "env-cmd electron-builder",
+    "release": "env-cmd electron-builder",
+    "lint": "standard"
+  },
+  "author": "mn6",
+  "license": "ISC",
+  "build": {
+    "extraResources": [
+      "./build/icons/**"
+    ],
+    "afterSign": "build/notarize.js",
+    "productName": "Nook",
+    "appId": "com.mn6.nookdesktop",
+    "mac": {
+      "gatekeeperAssess": false,
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "artifactName": "${productName}Setup.${ext}",
+      "icon": "build/icons/nook.icns",
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.music"
+    },
+    "win": {
+      "artifactName": "${productName}Setup.${ext}",
+      "icon": "build/icons/nook.png",
+      "target": [
+        "nsis-web"
+      ]
+    }
+  },
+  "publish": {
+    "provider": "github"
+  },
+  "nsis": {
+    "installerIcon": "build/icons/nook.png",
+    "uninstallerIcon": "build/icons/nook.png",
+    "artifactName": "${productName}Setup.${ext}"
+  },
+  "dmg": {
+    "icon": "build/icons/nook.icns",
+    "sign": false
+  },
+  "devDependencies": {
+    "electron": "^21.2.3",
+    "electron-builder": "^23.6.0",
+    "electron-notarize": "^1.2.2",
+    "standard": "^17.0.0"
+  },
+  "dependencies": {
+    "@analytics/google-analytics": "^1.0.5",
+    "analytics": "^0.8.1",
+    "dmg-license": "^1.0.11",
+    "dotenv": "^16.0.3",
+    "electron-json-storage": "^4.6.0",
+    "electron-log": "^4.4.8",
+    "electron-updater": "^5.3.0",
+    "env-cmd": "^10.1.0",
+    "fs": "^0.0.1-security",
+    "superagent": "^8.0.3",
+    "uuid": "^9.0.0"
+  },
+  "standard": {
+    "ignore": [
+      "howler.min.js",
+      "wad.js"
+    ]
+  }
+}
