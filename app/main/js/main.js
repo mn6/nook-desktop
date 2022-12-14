@@ -14,7 +14,8 @@ let language = 'en'
 // Load translations here
 const translations = {
   en: require('./i18n/Nook_English.json'),
-  es: require('./i18n/Nook_Spanish.json')
+  es: require('./i18n/Nook_Spanish.json'),
+  de: require('./i18n/Nook_German.json')
 }
 
 const kkSongs = require('../kk.json')
@@ -157,6 +158,9 @@ const template = `
                 </option>
                 <option value="es">
                     Spanish (ES)
+                </option>
+                <option value="de">
+                    German (DE)
                 </option>
               </select>
           </label>
