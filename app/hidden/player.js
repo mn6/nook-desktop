@@ -241,8 +241,7 @@ const timeCheck = async () => {
       if (kkSaturday && ~['8pm', '9pm', '10pm', '11pm'].indexOf(newHour) && (new Date().getDay() === 6)) {
         game = 'kk-slider-desktop'
         ipc.send('toWindow', ['updateGame', game])
-      }
-      if (kkSaturday && (newHour === '12am') && (new Date().getDay() === 0)) {
+      } else if (kkSaturday && (newHour === '12am') && (new Date().getDay() === 0)) {
         game = storage.getSync('game').game || 'new-leaf'
         ipc.send('toWindow', ['updateGame', game])
       }
