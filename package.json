@@ -61,7 +61,6 @@
   "dependencies": {
     "@analytics/google-analytics": "^1.0.5",
     "analytics": "^0.8.1",
-    "dmg-license": "^1.0.11",
     "dotenv": "^16.0.3",
     "electron-json-storage": "^4.6.0",
     "electron-log": "^4.4.8",
@@ -70,6 +69,9 @@
     "fs": "^0.0.1-security",
     "superagent": "^8.0.3",
     "uuid": "^9.0.0"
+  },
+  "optionalDependencies": {
+    "dmg-license": "^1.0.11"
   },
   "standard": {
     "ignore": [
