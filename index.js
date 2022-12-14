@@ -5,7 +5,8 @@ const {
   nativeImage,
   Menu,
   ipcMain,
-  shell
+  shell,
+  powerMonitor
 } = require('electron')
 
 const os = require('os')
@@ -114,6 +115,10 @@ const createWindow = () => {
   })
   hiddenWin.setSkipTaskbar(true)
   hiddenWin.loadFile('./app/hidden/index.html')
+
+  powerMonitor.addListener('suspend', () => {
+    hiddenWin.webContents.send('toPlayer', ['pauseIfPlaying'])
+  })
 
   ipcMain.on('playerLoaded', () => {
     hiddenWin.webContents.send('toPlayer', [

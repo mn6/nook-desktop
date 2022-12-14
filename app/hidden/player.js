@@ -166,7 +166,6 @@ const fadeSound = async (mode = 'sound', fadeIn = true) => {
 }
 
 const playSound = async url => {
-  console.log('playing ', url)
   if (!url) return
   const context = new AudioContext()
   const audioBuffer = await fetch(url)
@@ -241,8 +240,7 @@ const timeCheck = async () => {
       if (kkSaturday && ~['8pm', '9pm', '10pm', '11pm'].indexOf(newHour) && (new Date().getDay() === 6)) {
         game = 'kk-slider-desktop'
         ipc.send('toWindow', ['updateGame', game])
-      }
-      if (kkSaturday && (newHour === '12am') && (new Date().getDay() === 6)) {
+      } else if (kkSaturday && (newHour === '12am') && (new Date().getDay() === 0)) {
         game = storage.getSync('game').game || 'new-leaf'
         ipc.send('toWindow', ['updateGame', game])
       }
@@ -335,6 +333,12 @@ const handleIpc = async (event, arg) => {
   } else if (command === 'paused') {
     storage.set('paused', { paused: arg[0] })
     pauseClicked()
+  } else if (command === 'pauseIfPlaying') {
+    if (!paused) {
+      storage.set('paused', { paused: true })
+      pauseClicked()
+      ipc.send('toWindow', ['pause'])
+    }
   } else if (command === 'downloadHourly') {
     await downloadHourly()
   } else if (command === 'downloadKK') {
@@ -650,6 +654,7 @@ const playChime = async (play) => {
     if (!play) return resolve('done')
     let i = 0
     chimeInt = setInterval(() => {
+      chime.setVolume(soundVol)
       if (tune[i] !== 'zZz' && tune[i] !== '-' && tune[i] !== '?') {
         chime[tune[i]].play()
       } else if (tune[i] === '?') {
