@@ -166,7 +166,6 @@ const fadeSound = async (mode = 'sound', fadeIn = true) => {
 }
 
 const playSound = async url => {
-  console.log('playing ', url)
   if (!url) return
   const context = new AudioContext()
   const audioBuffer = await fetch(url)
@@ -655,8 +654,6 @@ const playChime = async (play) => {
     if (!play) return resolve('done')
     let i = 0
     chimeInt = setInterval(() => {
-      console.log('playing one')
-      console.log(soundVol)
       chime.setVolume(soundVol)
       if (tune[i] !== 'zZz' && tune[i] !== '-' && tune[i] !== '?') {
         chime[tune[i]].play()
