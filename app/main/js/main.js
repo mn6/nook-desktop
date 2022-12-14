@@ -678,6 +678,9 @@ $(document).ready(() => {
       })
     } else if (arg[0] === 'updateGame') {
       $('#gameSelect').val(arg[1])
+    } else if (arg[0] === 'pause') {
+      paused = true
+      pause(true)
     }
   })
 })

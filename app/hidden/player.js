@@ -242,7 +242,7 @@ const timeCheck = async () => {
         game = 'kk-slider-desktop'
         ipc.send('toWindow', ['updateGame', game])
       }
-      if (kkSaturday && (newHour === '12am') && (new Date().getDay() === 6)) {
+      if (kkSaturday && (newHour === '12am') && (new Date().getDay() === 0)) {
         game = storage.getSync('game').game || 'new-leaf'
         ipc.send('toWindow', ['updateGame', game])
       }
@@ -335,6 +335,12 @@ const handleIpc = async (event, arg) => {
   } else if (command === 'paused') {
     storage.set('paused', { paused: arg[0] })
     pauseClicked()
+  } else if (command === 'pauseIfPlaying') {
+    if (!paused) {
+      storage.set('paused', { paused: true })
+      pauseClicked()
+      ipc.send('toWindow', ['pause'])
+    }
   } else if (command === 'downloadHourly') {
     await downloadHourly()
   } else if (command === 'downloadKK') {
