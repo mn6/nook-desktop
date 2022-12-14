@@ -656,6 +656,9 @@ const playChime = async (play) => {
     if (!play) return resolve('done')
     let i = 0
     chimeInt = setInterval(() => {
+      console.log('playing one')
+      console.log(soundVol)
+      chime.setVolume(soundVol)
       if (tune[i] !== 'zZz' && tune[i] !== '-' && tune[i] !== '?') {
         chime[tune[i]].play()
       } else if (tune[i] === '?') {
