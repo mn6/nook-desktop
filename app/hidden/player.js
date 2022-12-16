@@ -506,7 +506,7 @@ const doMain = () => {
     ]
   }
 
-  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday }])
+  ipc.send('toWindow', ['configs', { dataPath: storage.getDataPath(), soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday }])
 
   superagent
     .get('https://cms.mat.dog/getSupporters')

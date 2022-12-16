@@ -4,7 +4,7 @@
 }
 @font-face {
     font-family: FaSolid;
-    src: url(../font/fa-solid.otf);
+    src: url(../font/fa-solid.woff2);
 }
 @font-face {
     font-family: FaBrands;
@@ -18,7 +18,7 @@ html, * {
 
 html, body {
     margin: 0;
-    height: 100%;
+    height: auto;
     width: 100%;
 }
 
@@ -104,17 +104,19 @@ html {
     -webkit-app-region: no-drag;
 }
 
-button#patreon {
-    margin-top: 10px;
+.bottom-support button {
+    margin-top: 18px;
     font-weight: bold;
     border: none;
-    background: none;
-    height: 30px;
-    color: white;
+    border-radius: 10px;
+    background: linear-gradient(34deg, #9b9aff0f, #a90b0b30);
     cursor: pointer;
-    width: 70px;
-    font-size: 10px;
-    font-family: OpenSans;
+    color: white;
+    font-size: 16px;
+    width: 40px;
+    font-family: 'FaSolid';
+    height: 40px;
+    padding: 8px 9px 8px 10px;
 }
 
 button#clearSettings {
@@ -328,6 +330,12 @@ select optgroup {
 }
 
 .tune-settings p {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.fish p {
     text-align: center;
     font-weight: bold;
     margin-bottom: 15px;
@@ -910,4 +918,136 @@ radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgb(175, 175, 175);
+}
+
+.game {
+    width: 350px;
+    height: 200px;
+    background: #110527;
+    margin: 18px auto;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.fish-entity {
+    z-index: 2;
+    font-family: 'FaSolid';
+    position: absolute;
+    left: 9px;
+    top: 12px;
+    line-height: 31px;
+    display: block;
+    font-size: 35px;
+    width: fit-content;
+    height: 32px;
+    margin: 0;
+    color: #423853;
+    cursor: pointer;
+    animation: blink 4s infinite, wobble1 8s ease-in-out infinite;
+}
+
+.fish-entity:hover {
+    z-index: 3;
+}
+
+.bg-entity {
+    font-family: 'FaSolid';
+    position: absolute;
+    line-height: 31px;
+    display: block;
+    font-size: 25px;
+    width: fit-content;
+    height: 32px;
+    margin: 0;
+    color: #fff;
+    z-index: 1;
+}
+
+.entity-1 {
+    animation: blink 4s infinite, wobble1 8s ease-in-out infinite;
+}
+.entity-1:hover {
+    transition: opacity 2s, color 2s;
+    opacity: 1;
+    color: #ffffff;
+
+    animation: wobble1 8s ease-in-out infinite, shake 200ms ease-in-out infinite;
+}
+.entity-2 {
+    animation: blink 3s infinite, wobble2 7s ease-in-out infinite;
+}
+.entity-2:hover {
+    transition: opacity 2s, color 2s;
+    opacity: 1;
+    color: #ffffff;
+
+    animation: wobble2 7s ease-in-out infinite, shake 200ms ease-in-out infinite;
+}
+.entity-3 {
+    animation: blink 5s infinite, wobble3 10s ease-in-out infinite;
+}
+.entity-3:hover {
+    transition: opacity 2s, color 2s;
+    opacity: 1;
+    color: #ffffff;
+
+    animation: wobble3 10s ease-in-out infinite, shake 200ms ease-in-out infinite;
+}
+.entity-4 {
+    animation: blink 6s infinite, wobble4 6s ease-in-out infinite;
+}
+.entity-4:hover {
+    transition: opacity 2s, color 2s;
+    opacity: 1;
+    color: #ffffff;
+
+    animation: wobble4 6s ease-in-out infinite, shake 200ms ease-in-out infinite;
+}
+
+@keyframes blink {
+    0% {opacity: 1;}
+    50% {opacity: 0.4;}
+    100% {opacity: 1;}
+}
+
+@keyframes wobble1 {
+    0% {translate: 0px;}
+    25% {translate: 5px;}
+    50% {translate: 0px;}
+    75% {translate: -5px;}
+    100% {translate: 0px;}
+}
+
+@keyframes wobble2 {
+    0% {translate: 0px;}
+    25% {translate: -5px;}
+    50% {translate: 0px;}
+    75% {translate: 5px;}
+    100% {translate: 0px;}
+}
+
+@keyframes wobble3 {
+    0% {translate: 0px;}
+    25% {translate: -2px;}
+    50% {translate: 0px;}
+    75% {translate: 3px;}
+    100% {translate: 0px;}
+}
+
+@keyframes wobble4 {
+    0% {translate: 0px;}
+    25% {translate: 2px;}
+    50% {translate: 0px;}
+    75% {translate: -3px;}
+    100% {translate: 0px;}
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
 }

@@ -1,15 +1,18 @@
+const storage = require('electron-json-storage')
 const request = require('superagent')
 const uuid = require('uuid')
 const ipc = require('electron').ipcRenderer
 const $ = window.jQuery
 const Nanobar = window.Nanobar
 const CustomEvent = window.CustomEvent
+const Audio = window.Audio
 const confirm = window.confirm
 const u = uuid.v4()
 let i18n
 let blinkers
 let paused = false
 let language = 'en'
+let fishClaimed
 
 // Load translations here
 const translations = {
@@ -115,7 +118,8 @@ const template = `
               </select>    
           </div>
           <div class="bottom-support">
-              <button id="patreon" data-i18n="patreon" data-i18n-title="Patreon list and support links"></button>
+              <button id="patreon" data-i18n-title="Patreon list and support links"></button>
+              <button id="game" data-i18n-title="Fish!"></button>
           </div>
       </div>
       <div class="settings page hidden">
@@ -289,9 +293,18 @@ const template = `
               </div>
           </div>
       </div>
+      <div class="fish page hidden">
+          <p data-i18n="pond" role="heading" aria-level="1"></p>
+          <div class="game"></div>
+      </div>
   </div>
 </div>
 `
+
+const fishEntity = '<span class="fish-entity entity-{{index}}" style="rotate: {{deg}}deg;font-size: {{size}}px;left: {{left}}px;top: {{top}}px;"></span>'
+const waterEntity = '<span class="bg-entity water" style="left: {{left}}px;top: {{top}}px;opacity: {{opacity}};"></span>'
+const lilyEntity = '<span class="bg-entity lily" style="rotate: {{deg}}deg;left: {{left}}px;top: {{top}}px;opacity: {{opacity}};"></span>'
+const dropEntity = '<span class="bg-entity drop" style="rotate: {{deg}}deg;left: {{left}}px;top: {{top}}px;opacity: {{opacity}};"></span>'
 
 const pause = (state) => {
   const btn = $('#pause')
@@ -367,8 +380,64 @@ const changeLang = (lang, manual, arg) => {
         el.find('input').val(tunes.indexOf(arg.tune[i]) + 1)
         el.find('input').attr('c', el.find('input').val())
       })
+
+      storage.setDataPath(arg.dataPath)
     }, 0)
   }
+}
+
+const setFish = fishClaimed => {
+  let fishColl = ''
+  let history = { left: [], top: [] }
+  const generateNum = (maxSize, closeness, which) => {
+    while (true) {
+      const result = Math.trunc(Math.random() * maxSize)
+      if (history[which].every(last => {
+        return Math.abs(result - last) > closeness
+      })) {
+        history[which].push(result)
+        return result
+      }
+    }
+  }
+  if (fishClaimed < 4) {
+    for (let i = 1; i <= (4 - fishClaimed); i++) {
+      const vals = {
+        index: i,
+        deg: ~~(Math.random() * 361),
+        size: 25 + ~~(Math.random() * 11),
+        left: 9 + generateNum(296, 20, 'left'),
+        top: 12 + generateNum(147, 20, 'top')
+      }
+
+      fishColl += fishEntity.replaceAll('{{index}}', vals.index).replaceAll('{{deg}}', vals.deg).replaceAll('{{size}}', vals.size).replaceAll('{{left}}', vals.left).replaceAll('{{top}}', vals.top)
+    }
+  }
+
+  let bgColl = ''
+  history = { left: [], top: [] }
+
+  for (let i = 0; i < 4; i++) {
+    const vals = {
+      lilyDeg: ~~(Math.random() * 361),
+      dropDeg: ~~(Math.random() * (~~(Math.random() * 2) === 0 ? -8 : 8)),
+      left1: 9 + generateNum(296, 6, 'left'),
+      left2: 9 + generateNum(296, 6, 'left'),
+      left3: 9 + generateNum(296, 6, 'left'),
+      top1: 12 + generateNum(147, 6, 'top'),
+      top2: 12 + generateNum(147, 6, 'top'),
+      top3: 12 + generateNum(147, 6, 'top'),
+      opacity1: `0.0${2 + ~~(Math.random() * 4)}`,
+      opacity2: `0.0${2 + ~~(Math.random() * 4)}`,
+      opacity3: `0.0${2 + ~~(Math.random() * 4)}`
+    }
+
+    bgColl += lilyEntity.replace('{{deg}}', vals.lilyDeg).replace('{{left}}', vals.left1).replace('{{top}}', vals.top1).replace('{{opacity}}', vals.opacity1)
+    bgColl += dropEntity.replace('{{deg}}', vals.dropDeg).replace('{{left}}', vals.left2).replace('{{top}}', vals.top2).replace('{{opacity}}', vals.opacity2)
+    bgColl += waterEntity.replace('{{left}}', vals.left3).replace('{{top}}', vals.top3).replace('{{opacity}}', vals.opacity3)
+  }
+
+  $('.fish .game').html(bgColl + fishColl)
 }
 
 const logVis = (page) => {
@@ -434,6 +503,25 @@ const exec = () => {
 
     $('.page').addClass('hidden')
     $('.patreon.page').removeClass('hidden')
+
+    $('#settings').addClass('hidden')
+    $('#home').removeClass('hidden').focus()
+  })
+
+  $('#game').on('click', () => {
+    logVis('game')
+
+    // Get amount of fish claimed today
+    fishClaimed = storage.getSync('fishClaimed')
+    if (fishClaimed && fishClaimed[new Date().toLocaleDateString('en-US')] !== undefined) {
+      fishClaimed = fishClaimed[new Date().toLocaleDateString('en-US')]
+    } else {
+      fishClaimed = 0
+    }
+    setFish(fishClaimed)
+
+    $('.page').addClass('hidden')
+    $('.fish.page').removeClass('hidden')
 
     $('#settings').addClass('hidden')
     $('#home').removeClass('hidden').focus()
@@ -623,6 +711,21 @@ const exec = () => {
       i++
     }, 350)
   })
+
+  $(document).on('click', '.fish-entity', (e) => {
+    // TODO: choose fish that was claimed and save to DB
+    // make fish appear under the cursor and glow if new, then fade away
+    // collection screen should be done with pure css, may need to create blank images for fish placeholders
+    // collection button should have a little notification with the number of new fish obtained while on the screen
+    e.target.remove()
+    const audio = new Audio('./sound/boop.ogg')
+    audio.volume = 0.5
+    audio.play()
+    fishClaimed++
+    storage.set('fishClaimed', {
+      [new Date().toLocaleDateString('en-US')]: fishClaimed
+    })
+  })
 }
 
 const showErr = (err) => {
@@ -632,55 +735,53 @@ const showErr = (err) => {
   }, 4000)
 }
 
-$(document).ready(() => {
-  ipc.on('toWindow', (event, arg) => {
-    if (arg[0] === 'bar') {
-      nanobar.go(+arg[1])
-    } else if (arg[0] === 'configs') {
-      changeLang(arg[1].lang, false, arg[1])
+ipc.on('toWindow', (event, arg) => {
+  if (arg[0] === 'bar') {
+    nanobar.go(+arg[1])
+  } else if (arg[0] === 'configs') {
+    changeLang(arg[1].lang, false, arg[1])
 
-      nanobar = new Nanobar({
-        classname: 'nanobar',
-        id: 'nanobar',
-        target: $('.header')[0]
-      })
-      nanobar.go(0)
+    nanobar = new Nanobar({
+      classname: 'nanobar',
+      id: 'nanobar',
+      target: $('.header')[0]
+    })
+    nanobar.go(0)
 
-      replaceData.offlineFiles = arg[1].offlineFiles
-      replaceData.offlineKKFiles = arg[1].offlineKKFiles
-    } else if (arg[0] === 'error') {
-      if (arg[1] === 'failedToDownload') {
-        nanobar.go(100)
-      }
-      showErr(i18n(arg[1]))
-    } else if (arg[0] === 'downloadDone') {
-      if (arg[1] === 'kk') {
-        replaceData.offlineKKFiles++
-      } else {
-        replaceData.offlineFiles++
-      }
-    } else if (arg[0] === 'downloadRemoved') {
-      if (arg[1] === 'kk') {
-        replaceData.offlineKKFiles--
-      } else {
-        replaceData.offlineFiles--
-      }
-    } else if (arg[0] === 'downloadDoneAll') {
-      $('.settings .download').removeAttr('disabled')
-      $('.settings #downloadHourly').text(i18n($('.settings #downloadHourly').attr('data-i18n')))
-      $('.settings #downloadKK').text(i18n($('.settings #downloadKK').attr('data-i18n')))
-    } else if (arg[0] === 'patreon') {
-      const template = '<li title="{{fill}}">{{fill}}</li>'
-      Object.entries(arg[1]).forEach(thing => {
-        thing[1].forEach(name => {
-          $(`.${thing[0]} ul`).append(template.replaceAll('{{fill}}', name))
-        })
-      })
-    } else if (arg[0] === 'updateGame') {
-      $('#gameSelect').val(arg[1])
-    } else if (arg[0] === 'pause') {
-      paused = true
-      pause(true)
+    replaceData.offlineFiles = arg[1].offlineFiles
+    replaceData.offlineKKFiles = arg[1].offlineKKFiles
+  } else if (arg[0] === 'error') {
+    if (arg[1] === 'failedToDownload') {
+      nanobar.go(100)
     }
-  })
+    showErr(i18n(arg[1]))
+  } else if (arg[0] === 'downloadDone') {
+    if (arg[1] === 'kk') {
+      replaceData.offlineKKFiles++
+    } else {
+      replaceData.offlineFiles++
+    }
+  } else if (arg[0] === 'downloadRemoved') {
+    if (arg[1] === 'kk') {
+      replaceData.offlineKKFiles--
+    } else {
+      replaceData.offlineFiles--
+    }
+  } else if (arg[0] === 'downloadDoneAll') {
+    $('.settings .download').removeAttr('disabled')
+    $('.settings #downloadHourly').text(i18n($('.settings #downloadHourly').attr('data-i18n')))
+    $('.settings #downloadKK').text(i18n($('.settings #downloadKK').attr('data-i18n')))
+  } else if (arg[0] === 'patreon') {
+    const template = '<li title="{{fill}}">{{fill}}</li>'
+    Object.entries(arg[1]).forEach(thing => {
+      thing[1].forEach(name => {
+        $(`.${thing[0]} ul`).append(template.replaceAll('{{fill}}', name))
+      })
+    })
+  } else if (arg[0] === 'updateGame') {
+    $('#gameSelect').val(arg[1])
+  } else if (arg[0] === 'pause') {
+    paused = true
+    pause(true)
+  }
 })

@@ -166,3 +166,7 @@ app.whenReady().then(() => {
 autoUpdater.logger = require('electron-log')
 autoUpdater.logger.transports.file.level = 'info'
 autoUpdater.checkForUpdatesAndNotify()
+
+try {
+  require('electron-reloader')(module)
+} catch (_) {}
