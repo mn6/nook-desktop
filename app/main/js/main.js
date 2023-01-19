@@ -158,13 +158,13 @@ const template = `
                     English (US)
                 </option>
                 <option value="es">
-                    Spanish (ES)
+                    Spanish/Español (ES)
                 </option>
                 <option value="de">
-                    German (DE)
+                    German/Deutsch (DE)
                 </option>
                 <option value="fr">
-                    French (FR)
+                    French/Français (FR)
                 </option>
               </select>
           </label>
