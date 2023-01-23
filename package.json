@@ -53,8 +53,8 @@
     "sign": false
   },
   "devDependencies": {
-    "electron": "^21.2.3",
-    "electron-builder": "^23.6.0",
+    "electron": "^22.0.3",
+    "electron-builder": "^22.10.3",
     "electron-notarize": "^1.2.2",
     "standard": "^17.0.0"
   },
