@@ -51,11 +51,11 @@
   <g
      transform="matrix(1,0,0,-1,402.44068,1239.8644)"
      id="g2991"
-     style="fill:#ffffff">
+     style="fill:#cdd6f4">
     <path
        d="m 1024,832 q 0,-26 -19,-45 L 557,339 q -19,-19 -45,-19 -26,0 -45,19 L 19,787 q -19,19 -19,45 0,26 19,45 19,19 45,19 h 896 q 26,0 45,-19 19,-19 19,-45 z"
        id="path2993"
        inkscape:connector-curvature="0"
-       style="fill:#ffffff" />
+       style="fill:#cdd6f4" />
   </g>
 </svg>

@@ -68,7 +68,7 @@ const tunes = [
 
 let nanobar
 
-const template = `
+const template = /* html */`
 <div class="container overlay">
   <div class="error"><div></div></div>
   <div class="header">

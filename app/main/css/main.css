@@ -43,11 +43,11 @@ html {
 }
 
 .header {
-    color: white;
+    color: var(--Text);
     height: 50px;
     margin-bottom: -1px;
     width: 100%;
-    background: rgb(7, 2, 14);
+    background: var(--Crust);
     user-select: none;
     -webkit-user-select: none;
     -webkit-app-region: drag;
@@ -84,7 +84,7 @@ html {
     background: none;
     height: 30px;
     width: 30px;
-    color: white;
+    color: var(--Text);
     font-size: 25px;
     cursor: pointer;
     -webkit-app-region: no-drag;
@@ -97,7 +97,7 @@ html {
     background: none;
     height: 30px;
     width: 30px;
-    color: white;
+    color: var(--Text);
     font-size: 25px;
     padding: 2px;
     cursor: pointer;
@@ -110,7 +110,7 @@ button#patreon {
     border: none;
     background: none;
     height: 30px;
-    color: white;
+    color: var(--Text);
     cursor: pointer;
     width: 70px;
     font-size: 10px;
@@ -123,7 +123,7 @@ button#clearSettings {
     border: none;
     background: none;
     height: 30px;
-    color: rgb(253, 76, 76);
+    color: var(--Red);
     cursor: pointer;
     width: 130px;
     padding: 0;
@@ -158,9 +158,9 @@ button.download {
     font-weight: bold;
     border: none;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--Mantle);
     height: 30px;
-    color: rgb(255, 255, 255);
+    color: var(--Text);
     cursor: pointer;
     width: 170px;
     padding: 0;
@@ -173,9 +173,9 @@ button.download {
     font-weight: bold;
     border: none;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--Mantle);
     height: 30px;
-    color: rgb(255, 255, 255);
+    color: var(--Text);
     cursor: pointer;
     width: 62px;
     padding: 0;
@@ -188,9 +188,9 @@ button.download {
     font-weight: bold;
     border: none;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--Mantle);
     height: 30px;
-    color: rgb(255, 255, 255);
+    color: var(--Text);
     cursor: pointer;
     width: auto;
     padding: 0 7px;
@@ -239,15 +239,15 @@ button.download {
     overflow: hidden;
     height: 100%;
     width: 100%;
-    background: rgb(22, 7, 43);
+    background: var(--Base);
     max-height: 226px;
 }
 
 .main {
     padding-top: 20px;
     user-select: none;
-    background: rgb(22, 7, 43);
-    color: white;
+    background: var(--Base);
+    color: var(--Text);
     padding-bottom: 15px;
     max-height: 350px;
     overflow-y: scroll;
@@ -284,20 +284,20 @@ select {
     width: 79%;
     height: 3em;
     padding: 0 4em 0 1em;
-    background: url(../font/caret.svg) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, rgb(255 255 255 / 9%) 3em, rgb(255 255 255 / 5%) 3em);
-    color: white;
+    background: url(../font/caret.svg) no-repeat right 0.8em center / 1.4em, linear-gradient(to left, var(--Surface1) 3em, var(--Surface0) 3em);
+    color: var(--Text);
     border-radius: 0.5em;
     cursor: pointer;
 }
   
 select option {
     color: inherit;
-    background-color: #320a28;
+    background-color: var(--Mantle);
 }
   
 select optgroup {
     color: inherit;
-    background-color: #320a28;
+    background-color: var(--Mantle);
 }
 
 *:focus-visible {
@@ -413,7 +413,7 @@ select optgroup {
 
 .supporters > div {
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.384);
+    background: var(--Mantle);
     padding: 5px;
     margin: auto;
     margin-top: 15px;
@@ -462,8 +462,8 @@ select optgroup {
 button.towntune-custom {
     border: 0;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
+    background: var(--Mantle);
+    color: var(--Text);
     font-weight: bold;
     font-size: 11px;
     margin-left: 5px;
@@ -474,8 +474,8 @@ button.towntune-custom {
 button#kkCustomize {
     border: 0;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
+    background: var(--Mantle);
+    color: var(--Text);
     font-weight: bold;
     font-size: 11px;
     margin-left: 5px;
@@ -734,7 +734,7 @@ radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
     left: -4px;
     font-weight: bold;
     font-size: 15px;
-    color: white;
+    color: var(--Text);
     text-shadow: 0 0 4px #000000c7;
 }
 
@@ -860,7 +860,7 @@ radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
     position: absolute;
     z-index: 1;
     background: #481919;
-    color: white;
+    color: var(--Text);
     width: 100%;
     height: auto;
     top: -50px;
@@ -884,7 +884,7 @@ radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
 }
 
 #openGithub {
-    color: white;
+    color: var(--Text);
     text-decoration: none;
     cursor: pointer;
     -webkit-app-region: none;
