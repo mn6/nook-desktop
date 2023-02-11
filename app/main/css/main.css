@@ -117,6 +117,20 @@ button#patreon {
     font-family: OpenSans;
 }
 
+button#changelog {
+    margin-top: 10px;
+    font-weight: bold;
+    border: none;
+    background: none;
+    height: 30px;
+    color: white;
+    cursor: pointer;
+    width: 70px;
+    font-size: 10px;
+    margin-left: -14px;
+    font-family: OpenSans;
+}
+
 button#clearSettings {
     margin-top: 10px;
     font-weight: bold;
@@ -328,6 +342,12 @@ select optgroup {
 }
 
 .tune-settings p {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.changelog p {
     text-align: center;
     font-weight: bold;
     margin-bottom: 15px;
@@ -910,4 +930,19 @@ radial-gradient(ellipse at 21px 23px, #ff72d2 0%, #ff72d2 10%, transparent 11%);
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgb(175, 175, 175);
+}
+
+.changelog .log p {
+    color: #fff0c7;
+}
+
+.changelog .log li {
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 3px;
+    text-align: center;
+}
+
+.changelog .log ul {
+    margin-bottom: 15px;
 }

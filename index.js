@@ -124,7 +124,8 @@ const createWindow = () => {
   ipcMain.on('playerLoaded', () => {
     hiddenWin.webContents.send('toPlayer', [
       'userSettingsPath',
-      userSettingsPath
+      userSettingsPath,
+      app.getVersion()
     ])
   })
 

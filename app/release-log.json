@@ -1,0 +1,26 @@
+{
+    "1.0.9": [
+        "Added this changelog :)",
+        "Added Wild World to City Folk label",
+        "Add French and Chinese translations",
+        "Improved hourly chime samples",
+        "Fixed offline mode playback",
+        "Minor bug fixes"
+    ],
+    "1.0.8": [
+        "Bug fixes",
+        "Added German translations"
+    ],
+    "1.0.7": [
+        "Fix windows issue where if closed with the context menu or alt+f4 it wouldn't close"
+    ],
+    "1.0.6": [
+        "Mac version published"
+    ],
+    "1.0.5": [
+        "Add GitHub link and mac publish config"
+    ],
+    "1.0.4": [
+        "Autoupdate notification fix"
+    ]
+}

@@ -20,6 +20,8 @@ const translations = {
   cn: require('./i18n/Nook_Chinese.json')
 }
 
+const changelog = require('../release-log.json')
+
 const kkSongs = require('../kk.json')
 const kkHtml = () => {
   let res = ''
@@ -117,7 +119,8 @@ const template = `
               </select>    
           </div>
           <div class="bottom-support">
-              <button id="patreon" data-i18n="patreon" data-i18n-title="Patreon list and support links"></button>
+            <button id="patreon" data-i18n="patreon" data-i18n-title="Patreon list and support links"></button>
+            <button id="changelog" data-i18n="changelog" data-i18n-title="changelog"></button>
           </div>
       </div>
       <div class="settings page hidden">
@@ -297,6 +300,10 @@ const template = `
               </div>
           </div>
       </div>
+      <div class="changelog page hidden">
+          <p data-i18n="changelog" role="heading" aria-level="1"></p>
+          <div class="log"></div>
+      </div>
   </div>
 </div>
 `
@@ -344,6 +351,12 @@ const changeLang = (lang, manual, arg) => {
     $(e).html(i18n($(e).attr('data-i18n')))
   })
 
+  let changelogHtml = ''
+  Object.keys(changelog).forEach(e => {
+    changelogHtml += `<p>${e}</p><ul><li>${changelog[e].join('</li><li>')}</li></ul>`
+  })
+  obj.find('.log').html(changelogHtml)
+
   if (!manual) $('body').append(obj)
 
   if (!manual) {
@@ -375,8 +388,16 @@ const changeLang = (lang, manual, arg) => {
         el.find('input').val(tunes.indexOf(arg.tune[i]) + 1)
         el.find('input').attr('c', el.find('input').val())
       })
+
+      if (arg.showChangelog) {
+        showChangelog()
+      }
     }, 0)
   }
+}
+
+const showChangelog = () => {
+  $('#changelog').click()
 }
 
 const logVis = (page) => {
@@ -442,6 +463,16 @@ const exec = () => {
 
     $('.page').addClass('hidden')
     $('.patreon.page').removeClass('hidden')
+
+    $('#settings').addClass('hidden')
+    $('#home').removeClass('hidden').focus()
+  })
+
+  $('#changelog').on('click', () => {
+    logVis('changelog')
+
+    $('.page').addClass('hidden')
+    $('.changelog.page').removeClass('hidden')
 
     $('#settings').addClass('hidden')
     $('#home').removeClass('hidden').focus()

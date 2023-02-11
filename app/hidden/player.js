@@ -35,6 +35,8 @@ let peacefulRain
 let kkEnabled
 let kkSaturday
 let preferNoDownload
+let latestVersion
+let currentVersion
 
 const tunes = [
   'G0',
@@ -166,7 +168,6 @@ const fadeSound = async (mode = 'sound', fadeIn = true) => {
 }
 
 const playSound = async url => {
-  console.log('playsound url', url)
   if (!url) return
   const context = new AudioContext()
   const audioBuffer = await fetch(url)
@@ -179,7 +180,6 @@ const playSound = async url => {
       ipc.send('toWindow', ['error', 'failedToLoadSound'])
     } else {
       // Delete corrupted file if it exists
-      console.log('i guess corrupted??')
       fs.unlink(url, err => {
         console.error(err)
         storage.remove(`meta-${url.split('/sound/')[1].replace('.ogg', '')}`)
@@ -265,8 +265,6 @@ const getUrl = async (oldUrl) => {
   const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
   const s = await localSave(oldUrl, newUrl, lastModified)
 
-  console.log(oldUrl)
-
   if ((s === 'err' || s === 'head fail' || s === 'no headers error') && !lastModified) {
     if (newUrl.includes('rain-')) {
       ipc.send('toWindow', ['error', 'failedToLoadRainSound'])
@@ -290,6 +288,7 @@ const handleIpc = async (event, arg) => {
 
   if (command === 'userSettingsPath') {
     userSettingsPath = arg[0]
+    currentVersion = arg[1]
     storage.setDataPath(arg[0])
     storage.keys((err, k) => {
       if (!err) keys = k
@@ -471,10 +470,16 @@ const doMain = () => {
   peacefulRain = storage.getSync('peacefulRain').enabled
   kkEnabled = storage.getSync('kkEnabled').songs
   kkSaturday = storage.getSync('kkSaturday').enabled
+  latestVersion = storage.getSync('latestVersion').version
+  let showChangelog = false
 
   offlineFiles = keys.filter(e => e.includes('meta-') && !e.includes('meta-kk-slider') && !e.includes('meta-rain')).length
   offlineKKFiles = keys.filter(e => e.includes('meta-kk-slider')).length
 
+  if (latestVersion !== currentVersion) {
+    storage.set('latestVersion', { version: currentVersion })
+    showChangelog = true
+  }
   if (paused === undefined) paused = false
   if (soundVol === undefined) soundVol = 0.50
   else soundVol = soundVol / 100
@@ -510,7 +515,7 @@ const doMain = () => {
     ]
   }
 
-  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday }])
+  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday, showChangelog }])
 
   superagent
     .get('https://cms.mat.dog/getSupporters')
