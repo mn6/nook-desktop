@@ -166,6 +166,7 @@ const fadeSound = async (mode = 'sound', fadeIn = true) => {
 }
 
 const playSound = async url => {
+  console.log('playsound url', url)
   if (!url) return
   const context = new AudioContext()
   const audioBuffer = await fetch(url)
@@ -178,6 +179,7 @@ const playSound = async url => {
       ipc.send('toWindow', ['error', 'failedToLoadSound'])
     } else {
       // Delete corrupted file if it exists
+      console.log('i guess corrupted??')
       fs.unlink(url, err => {
         console.error(err)
         storage.remove(`meta-${url.split('/sound/')[1].replace('.ogg', '')}`)
@@ -263,7 +265,9 @@ const getUrl = async (oldUrl) => {
   const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
   const s = await localSave(oldUrl, newUrl, lastModified)
 
-  if (s === 'err' || s === 'head fail' || s === 'no headers error') {
+  console.log(oldUrl)
+
+  if ((s === 'err' || s === 'head fail' || s === 'no headers error') && !lastModified) {
     if (newUrl.includes('rain-')) {
       ipc.send('toWindow', ['error', 'failedToLoadRainSound'])
     } else {
@@ -513,7 +517,12 @@ const doMain = () => {
     .then(res => {
       if (res && res.text) {
         ipc.send('toWindow', ['patreon', JSON.parse(res.text)])
+      } else {
+        ipc.send('toWindow', ['patreon', []])
       }
+    }).catch(err => {
+      console.log(err)
+      ipc.send('toWindow', ['patreon', []])
     })
 
   chime = new Wad({
