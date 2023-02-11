@@ -26,6 +26,8 @@ const progress = (win, num) => {
   win.webContents.send('toWindow', ['bar', num])
 }
 
+let myWindow
+
 const createWindow = () => {
   let tray
   const win = new BrowserWindow({
@@ -158,9 +160,20 @@ if (process.platform === 'win32') {
   app.setAppUserModelId(app.name)
 }
 
-app.whenReady().then(() => {
-  createWindow()
-})
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) app.quit()
+else {
+  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
+    if (myWindow) {
+      if (myWindow.isMinimized()) myWindow.restore()
+      myWindow.focus()
+    }
+  })
+
+  app.whenReady().then(() => {
+    myWindow = createWindow()
+  })
+}
 
 autoUpdater.logger = require('electron-log')
 autoUpdater.logger.transports.file.level = 'info'
