@@ -35,6 +35,8 @@ let peacefulRain
 let kkEnabled
 let kkSaturday
 let preferNoDownload
+let latestVersion
+let currentVersion
 
 const tunes = [
   'G0',
@@ -263,7 +265,7 @@ const getUrl = async (oldUrl) => {
   const lastModified = storage.getSync(`meta-${newUrl}`).lastModified
   const s = await localSave(oldUrl, newUrl, lastModified)
 
-  if (s === 'err' || s === 'head fail' || s === 'no headers error') {
+  if ((s === 'err' || s === 'head fail' || s === 'no headers error') && !lastModified) {
     if (newUrl.includes('rain-')) {
       ipc.send('toWindow', ['error', 'failedToLoadRainSound'])
     } else {
@@ -286,6 +288,7 @@ const handleIpc = async (event, arg) => {
 
   if (command === 'userSettingsPath') {
     userSettingsPath = arg[0]
+    currentVersion = arg[1]
     storage.setDataPath(arg[0])
     storage.keys((err, k) => {
       if (!err) keys = k
@@ -467,10 +470,16 @@ const doMain = () => {
   peacefulRain = storage.getSync('peacefulRain').enabled
   kkEnabled = storage.getSync('kkEnabled').songs
   kkSaturday = storage.getSync('kkSaturday').enabled
+  latestVersion = storage.getSync('latestVersion').version
+  let showChangelog = false
 
   offlineFiles = keys.filter(e => e.includes('meta-') && !e.includes('meta-kk-slider') && !e.includes('meta-rain')).length
   offlineKKFiles = keys.filter(e => e.includes('meta-kk-slider')).length
 
+  if (latestVersion !== currentVersion) {
+    storage.set('latestVersion', { version: currentVersion })
+    showChangelog = true
+  }
   if (paused === undefined) paused = false
   if (soundVol === undefined) soundVol = 0.50
   else soundVol = soundVol / 100
@@ -506,14 +515,19 @@ const doMain = () => {
     ]
   }
 
-  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday }])
+  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday, showChangelog }])
 
   superagent
     .get('https://cms.mat.dog/getSupporters')
     .then(res => {
       if (res && res.text) {
         ipc.send('toWindow', ['patreon', JSON.parse(res.text)])
+      } else {
+        ipc.send('toWindow', ['patreon', []])
       }
+    }).catch(err => {
+      console.log(err)
+      ipc.send('toWindow', ['patreon', []])
     })
 
   chime = new Wad({
