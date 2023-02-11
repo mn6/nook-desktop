@@ -1,8 +1,8 @@
 {
     "AC: Population Growing (GC)": "AC: Population Growing (GC)",
-    "AC: City Folk (Wii)": "AC: Wild World/City Folk (DS/Wii)",
-    "AC: City Folk (Wii) [Rainy]": "AC: Wild World/City Folk (DS/Wii) [Regen]",
-    "AC: City Folk (Wii) [Snowy]": "AC: Wild World/City Folk (DS/Wii) [Schnee]",
+    "AC: City Folk (Wii)": "AC: City Folk (Wii)",
+    "AC: City Folk (Wii) [Rainy]": "AC: City Folk (Wii) [Regen]",
+    "AC: City Folk (Wii) [Snowy]": "AC: City Folk (Wii) [Schnee]",
     "AC: New Leaf (3DS)": "AC: New Leaf (3DS)",
     "AC: New Leaf (3DS) [Rainy]": "AC: New Leaf (3DS) [Regen]",
     "AC: New Leaf (3DS) [Snowy]": "AC: New Leaf (3DS) [Schnee]",
@@ -64,5 +64,6 @@
     "Don't download music": "Musik nicht herunterladen",
     "(saves space, but no offline)": "(spart Platz, keine offline Nutzung möglich)",
     "tip: you can use the mouse wheel to adjust notes!": "Tipp: Benutze das Mausrad zur Änderung der Noten!",
-    "Nook GitHub": "Nook GitHub"
+    "Nook GitHub": "Nook GitHub",
+    "saved!": "gerettet!"
 }
