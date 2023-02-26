@@ -67,12 +67,11 @@ const createWindow = () => {
     win.setSkipTaskbar(true)
     win.hide()
 
-    const macTrayImage = 'nookTemplate.png'
+    const altTrayImage = 'nookTemplate.png'
     const trayImage = 'nookTray.png'
-    const trayIcon =
-      os.platform() === 'darwin'
-        ? nativeImage.createFromPath(path.join(assets, macTrayImage))
-        : nativeImage.createFromPath(path.join(assets, trayImage))
+    const trayIcon = (['darwin', 'linux'].some(p => p === os.platform()))
+      ? nativeImage.createFromPath(path.join(assets, altTrayImage))
+      : nativeImage.createFromPath(path.join(assets, trayImage))
     const trayMenu = Menu.buildFromTemplate([
       {
         label: 'Exit',
