@@ -47,7 +47,8 @@
         "pacman",
         "rpm",
         "flatpak"
-      ]
+      ],
+      "category": "Audio;Music;Player;AudioVideo"
     }
   },
   "publish": {
