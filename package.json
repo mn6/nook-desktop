@@ -40,7 +40,7 @@
       ]
     },
     "linux": {
-      "artifactName": "${productName}.${ext}",
+      "artifactName": "${name}.${ext}",
       "icon": "build/icons/nook.icns",
       "target": [
         "deb",
