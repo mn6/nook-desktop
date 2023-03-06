@@ -43,9 +43,10 @@
       "artifactName": "${productName}.${ext}",
       "icon": "build/icons/nook.icns",
       "target": [
-        "AppImage",
         "deb",
-        "pacman"
+        "pacman",
+        "rpm",
+        "flatpak"
       ]
     }
   },
