@@ -34,6 +34,7 @@ let gameRain
 let peacefulRain
 let kkEnabled
 let kkSaturday
+let openOnStartup
 let preferNoDownload
 let latestVersion
 let currentVersion
@@ -378,6 +379,10 @@ const handleIpc = async (event, arg) => {
     const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
     await stopAudio('sound')
     await playSound(await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`))
+  } else if (command === 'openOnStartup') {
+    openOnStartup = arg[0]
+    storage.set('openOnStartup', { enabled: arg[0] })
+    ipc.send('openOnStartup', [arg[0]])
   } else if (command === 'lang') {
     lang = arg[0]
     storage.set('lang', { lang: arg[0] })
@@ -470,6 +475,7 @@ const doMain = () => {
   peacefulRain = storage.getSync('peacefulRain').enabled
   kkEnabled = storage.getSync('kkEnabled').songs
   kkSaturday = storage.getSync('kkSaturday').enabled
+  openOnStartup = storage.getSync('openOnStartup').enabled
   latestVersion = storage.getSync('latestVersion').version
   let showChangelog = false
 
@@ -494,6 +500,7 @@ const doMain = () => {
   if (peacefulRain === undefined) peacefulRain = false
   if (kkEnabled === undefined) kkEnabled = kkSongs
   if (kkSaturday === undefined) kkSaturday = false
+  if (openOnStartup === undefined) openOnStartup = false
   if (tune === undefined) {
     tune = [
       'G1',
@@ -515,7 +522,7 @@ const doMain = () => {
     ]
   }
 
-  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday, showChangelog }])
+  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday, openOnStartup, showChangelog }])
 
   superagent
     .get('https://cms.mat.dog/getSupporters')

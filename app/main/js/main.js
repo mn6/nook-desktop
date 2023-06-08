@@ -151,6 +151,10 @@ const template = `
             <input id="kkSaturday" type="checkbox"/>
             <span data-i18n="Play K.K. music on Saturday nights"></span>
           </label>
+          <label>
+              <input id="openOnStartup" type="checkbox"/>
+              <span data-i18n="Open on startup"></span>
+          </label>
           <div class="btnContainer">
             <button id="kkCustomize" data-i18n="customize k.k. playlist"></button>
             <button class="towntune-custom" id="towntune_customize" data-i18n="customize town tune"></button>
@@ -375,6 +379,7 @@ const changeLang = (lang, manual, arg) => {
       $('#townTune').prop('checked', arg.tuneEnabled)
       $('#preferNoDownload').prop('checked', arg.preferNoDownload)
       $('#kkSaturday').prop('checked', arg.kkSaturday)
+      $('#openOnStartup').prop('checked', arg.openOnStartup)
 
       arg.kkEnabled.forEach((song) => {
         $(`.kk-customize input[data-title="${song}"]`).prop('checked', true)
@@ -550,6 +555,10 @@ const exec = () => {
 
   $('.settings #kkSaturday').on('change', (e) => {
     ipc.send('toPlayer', ['kkSaturday', e.target.checked])
+  })
+
+  $('.settings #openOnStartup').on('change', (e) => {
+    ipc.send('toPlayer', ['openOnStartup', e.target.checked])
   })
 
   $('.settings #langSelect').on('change', (e) => {

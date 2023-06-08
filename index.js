@@ -129,6 +129,12 @@ const createWindow = () => {
     ])
   })
 
+  ipcMain.on('openOnStartup', (event, args) => {
+    app.setLoginItemSettings({
+      openAtLogin: args[0]
+    })
+  })
+
   ipcMain.on('toPlayer', (event, args) => {
     hiddenWin.webContents.send('toPlayer', args)
   })
