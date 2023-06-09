@@ -72,7 +72,16 @@ const games = [
   'population-growing', 'population-growing-snowy', 'population-growing-cherry', 'population-growing-rainy', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons', 'new-horizons-rainy', 'new-horizons-snowy', 'pocket-camp'
 ]
 
-const soundLoaded = async (a, isSound = true) => {
+const convertGameToHuman = (game) => {
+  const g = game.split('-')
+  const finalGame = []
+  g.forEach(gameName => {
+    finalGame.push(gameName.substring(0, 1).toUpperCase() + gameName.substring(1))
+  })
+  return finalGame.join(' ')
+}
+
+const soundLoaded = async (a, isSound = true, url) => {
   return new Promise(async resolve => { // eslint-disable-line no-async-promise-executor
     if (paused) {
       resolve()
@@ -82,6 +91,9 @@ const soundLoaded = async (a, isSound = true) => {
         sound.isSound = isSound
         sound.start()
         await fadeSound('sound', true)
+        url = url.replace('kk-slider-desktop', 'kk-slider')
+        const friendlyHour = url.substring(url.lastIndexOf('/') + 1)
+        ipc.send('playing', [convertGameToHuman(friendlyHour.substring(0, friendlyHour.lastIndexOf('-'))), friendlyHour.substring(friendlyHour.lastIndexOf('-') + 1).replace('.ogg', '')])
       } else {
         rain = a
         rain.start()
@@ -117,6 +129,7 @@ const stopAudio = async (mode = 'sound') => {
       }
     }
     if (mode === 'sound' || mode === 'all') {
+      ipc.send('playing', [])
       if (!sound) {
         resolve('skip stop')
       } else {
@@ -199,7 +212,7 @@ const playSound = async url => {
       source.addEventListener('ended', kkEnded)
     }
 
-    await soundLoaded(source, true)
+    await soundLoaded(source, true, url)
   }
 }
 

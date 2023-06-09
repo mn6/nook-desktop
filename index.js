@@ -27,6 +27,7 @@ const progress = (win, num) => {
 }
 
 let myWindow
+let playing = 'Nook - playing nothing!'
 
 const createWindow = () => {
   let tray
@@ -84,7 +85,7 @@ const createWindow = () => {
       }
     ])
     tray = new Tray(trayIcon)
-    tray.setToolTip('Nook Desktop')
+    tray.setToolTip(playing)
     tray.setContextMenu(trayMenu)
     tray.addListener('click', show)
   }
@@ -104,7 +105,7 @@ const createWindow = () => {
   const hiddenWin = new BrowserWindow({
     width: 500,
     height: 500,
-    show: false,
+    show: true,
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
@@ -112,7 +113,7 @@ const createWindow = () => {
     },
     skipTaskbar: false,
     excludedFromShownWindowsMenu: true,
-    focusable: false
+    focusable: true
   })
   hiddenWin.setSkipTaskbar(true)
   hiddenWin.loadFile('./app/hidden/index.html')
@@ -152,6 +153,12 @@ const createWindow = () => {
 
     app.relaunch()
     app.exit()
+  })
+
+  ipcMain.on('playing', (event, args) => {
+    if (args[0]) playing = `Nook - playing ${args[0]} (${args[1]})!`
+    else playing = 'Nook - playing nothing!'
+    if (tray && !tray.isDestroyed()) tray.setToolTip(playing)
   })
 }
 

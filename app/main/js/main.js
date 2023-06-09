@@ -36,7 +36,7 @@ const replaceDataInit = {
   offlineKKFiles: 0,
   offlineFiles: 0,
   totalKKFiles: 193,
-  totalFiles: 292
+  totalFiles: 294
 }
 
 const replaceDataObs = {
@@ -322,6 +322,13 @@ const pause = (state) => {
   }
 }
 
+const setCooldown = () => {
+  $('.settings').find('input, button, select').attr('disabled', true)
+  setTimeout(() => {
+    $('.settings').find('input, button, select').removeAttr('disabled')
+  }, 300)
+}
+
 const changeLang = (lang, manual, arg) => {
   language = lang
   i18n = key => {
@@ -529,28 +536,34 @@ const exec = () => {
 
   $('.settings #grandFather').on('change', (e) => {
     ipc.send('toPlayer', ['grandFather', e.target.checked])
+    setCooldown()
   })
 
   $('.settings #gameRain').on('change', (e) => {
     ipc.send('toPlayer', ['gameRain', e.target.checked])
     $('#peacefulRain').prop('checked', false)
+    setCooldown()
   })
 
   $('.settings #peacefulRain').on('change', (e) => {
     ipc.send('toPlayer', ['peacefulRain', e.target.checked])
     $('#gameRain').prop('checked', false)
+    setCooldown()
   })
 
   $('.settings #townTune').on('change', (e) => {
     ipc.send('toPlayer', ['tuneEnabled', e.target.checked])
+    setCooldown()
   })
 
   $('.settings #preferNoDownload').on('change', (e) => {
     ipc.send('toPlayer', ['preferNoDownload', e.target.checked])
+    setCooldown()
   })
 
   $('.settings #kkSaturday').on('change', (e) => {
     ipc.send('toPlayer', ['kkSaturday', e.target.checked])
+    setCooldown()
   })
 
   $('.settings #langSelect').on('change', (e) => {
@@ -567,12 +580,14 @@ const exec = () => {
     $(e.currentTarget).text(i18n($(e.currentTarget).attr('data-i18n-alt')))
     $('.settings .download').attr('disabled', 'true')
     ipc.send('toPlayer', ['downloadHourly'])
+    setCooldown()
   })
 
   $('.settings #downloadKK').on('click', async (e) => {
     $(e.currentTarget).text(i18n($(e.currentTarget).attr('data-i18n-alt')))
     $('.settings .download').attr('disabled', 'true')
     ipc.send('toPlayer', ['downloadKK'])
+    setCooldown()
   })
 
   $('.kk-customize #save_kk').on('click', (e) => {
