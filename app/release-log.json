@@ -1,4 +1,8 @@
 {
+    "1.0.10": [
+        "Fixed New Leaf 9am and 5pm loops",
+        "Added Population Growing - Rainy Day, will always play the same tune"
+    ],
     "1.0.9": [
         "Added this changelog :)",
         "Added Wild World to City Folk label",

@@ -69,7 +69,7 @@ const tunesBeepMap = [
   'E6'
 ]
 const games = [
-  'population-growing', 'population-growing-snowy', 'population-growing-cherry', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons', 'new-horizons-rainy', 'new-horizons-snowy', 'pocket-camp'
+  'population-growing', 'population-growing-snowy', 'population-growing-cherry', 'population-growing-rainy', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons', 'new-horizons-rainy', 'new-horizons-snowy', 'pocket-camp'
 ]
 
 const soundLoaded = async (a, isSound = true) => {
@@ -444,7 +444,7 @@ const progress = num => {
 const getHour = () => {
   const d = new Date()
   const hrs = d.getHours()
-  return `${(hrs + 24) % 12 || 12}${hrs >= 12 ? 'pm' : 'am'}`
+  return game === 'population-growing-rainy' ? '12am' : `${(hrs + 24) % 12 || 12}${hrs >= 12 ? 'pm' : 'am'}`
 }
 
 const doTick = async () => {

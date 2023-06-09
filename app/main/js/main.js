@@ -103,6 +103,7 @@ const template = `
                   <option value="population-growing" data-i18n="AC: Population Growing (GC)"></option>
                   <option value="population-growing-snowy" data-i18n="AC: Population Growing (GC) [Snowy]"></option>
                   <option value="population-growing-cherry" data-i18n="AC: Population Growing (GC) [Sakura]"></option>
+                  <option value="population-growing-rainy" data-i18n="AC: Population Growing (GC) [Rainy Day]"></option>
                   <option value="wild-world" data-i18n="AC: City Folk (Wii)"></option>
                   <option value="wild-world-rainy" data-i18n="AC: City Folk (Wii) [Rainy]"></option>
                   <option value="wild-world-snowy" data-i18n="AC: City Folk (Wii) [Snowy]">}</option>
