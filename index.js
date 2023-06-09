@@ -105,7 +105,7 @@ const createWindow = () => {
   const hiddenWin = new BrowserWindow({
     width: 500,
     height: 500,
-    show: true,
+    show: false,
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
@@ -113,7 +113,7 @@ const createWindow = () => {
     },
     skipTaskbar: false,
     excludedFromShownWindowsMenu: true,
-    focusable: true
+    focusable: false
   })
   hiddenWin.setSkipTaskbar(true)
   hiddenWin.loadFile('./app/hidden/index.html')
