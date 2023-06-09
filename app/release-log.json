@@ -3,6 +3,8 @@
         "Fixed New Leaf 9am and 5pm loops",
         "Added Population Growing - Rainy Day, will always play the same tune",
         "Added label when minimized to tray to view the current tune's game and name",
+        "Fixed total download file count",
+        "Added Italian translations (thanks albanobattistella!)",
         "Minor bug fixes"
     ],
     "1.0.9": [
