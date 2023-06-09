@@ -34,6 +34,7 @@ let gameRain
 let peacefulRain
 let kkEnabled
 let kkSaturday
+let openOnStartup
 let preferNoDownload
 let latestVersion
 let currentVersion
@@ -69,10 +70,19 @@ const tunesBeepMap = [
   'E6'
 ]
 const games = [
-  'population-growing', 'population-growing-snowy', 'population-growing-cherry', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons', 'new-horizons-rainy', 'new-horizons-snowy', 'pocket-camp'
+  'population-growing', 'population-growing-snowy', 'population-growing-cherry', 'population-growing-rainy', 'wild-world', 'wild-world-rainy', 'wild-world-snowy', 'new-leaf', 'new-leaf-rainy', 'new-leaf-snowy', 'new-horizons', 'new-horizons-rainy', 'new-horizons-snowy', 'pocket-camp'
 ]
 
-const soundLoaded = async (a, isSound = true) => {
+const convertGameToHuman = (game) => {
+  const g = game.split('-')
+  const finalGame = []
+  g.forEach(gameName => {
+    finalGame.push(gameName.substring(0, 1).toUpperCase() + gameName.substring(1))
+  })
+  return finalGame.join(' ')
+}
+
+const soundLoaded = async (a, isSound = true, url) => {
   return new Promise(async resolve => { // eslint-disable-line no-async-promise-executor
     if (paused) {
       resolve()
@@ -82,6 +92,9 @@ const soundLoaded = async (a, isSound = true) => {
         sound.isSound = isSound
         sound.start()
         await fadeSound('sound', true)
+        url = url.replace('kk-slider-desktop', 'kk-slider')
+        const friendlyHour = url.substring(url.lastIndexOf('/') + 1)
+        ipc.send('playing', [convertGameToHuman(friendlyHour.substring(0, friendlyHour.lastIndexOf('-'))), friendlyHour.substring(friendlyHour.lastIndexOf('-') + 1).replace('.ogg', '')])
       } else {
         rain = a
         rain.start()
@@ -117,6 +130,7 @@ const stopAudio = async (mode = 'sound') => {
       }
     }
     if (mode === 'sound' || mode === 'all') {
+      ipc.send('playing', [])
       if (!sound) {
         resolve('skip stop')
       } else {
@@ -199,7 +213,7 @@ const playSound = async url => {
       source.addEventListener('ended', kkEnded)
     }
 
-    await soundLoaded(source, true)
+    await soundLoaded(source, true, url)
   }
 }
 
@@ -378,6 +392,10 @@ const handleIpc = async (event, arg) => {
     const gameUrl = game === 'random' ? games[~~(Math.random() * games.length)] : game
     await stopAudio('sound')
     await playSound(await getUrl(`${baseUrl}/${gameUrl}/${gameUrl === 'kk-slider-desktop' ? kkEnabled[~~(Math.random() * kkEnabled.length)] : gameUrl === 'pocket-camp' ? hourToPocketCamp(hour) : hour}.ogg`))
+  } else if (command === 'openOnStartup') {
+    openOnStartup = arg[0]
+    storage.set('openOnStartup', { enabled: arg[0] })
+    ipc.send('openOnStartup', [arg[0]])
   } else if (command === 'lang') {
     lang = arg[0]
     storage.set('lang', { lang: arg[0] })
@@ -444,7 +462,7 @@ const progress = num => {
 const getHour = () => {
   const d = new Date()
   const hrs = d.getHours()
-  return `${(hrs + 24) % 12 || 12}${hrs >= 12 ? 'pm' : 'am'}`
+  return game === 'population-growing-rainy' ? '12am' : `${(hrs + 24) % 12 || 12}${hrs >= 12 ? 'pm' : 'am'}`
 }
 
 const doTick = async () => {
@@ -470,6 +488,7 @@ const doMain = () => {
   peacefulRain = storage.getSync('peacefulRain').enabled
   kkEnabled = storage.getSync('kkEnabled').songs
   kkSaturday = storage.getSync('kkSaturday').enabled
+  openOnStartup = storage.getSync('openOnStartup').enabled
   latestVersion = storage.getSync('latestVersion').version
   let showChangelog = false
 
@@ -494,6 +513,7 @@ const doMain = () => {
   if (peacefulRain === undefined) peacefulRain = false
   if (kkEnabled === undefined) kkEnabled = kkSongs
   if (kkSaturday === undefined) kkSaturday = false
+  if (openOnStartup === undefined) openOnStartup = false
   if (tune === undefined) {
     tune = [
       'G1',
@@ -515,7 +535,7 @@ const doMain = () => {
     ]
   }
 
-  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday, showChangelog }])
+  ipc.send('toWindow', ['configs', { soundVol: soundVol * 100, rainVol: rainVol * 100, grandFather, game, lang, offlineFiles, offlineKKFiles, tune, tuneEnabled, preferNoDownload, paused, gameRain, peacefulRain, kkEnabled, kkSaturday, openOnStartup, showChangelog }])
 
   superagent
     .get('https://cms.mat.dog/getSupporters')

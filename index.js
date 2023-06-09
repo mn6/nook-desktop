@@ -27,6 +27,7 @@ const progress = (win, num) => {
 }
 
 let myWindow
+let playing = 'Nook - playing nothing!'
 
 const createWindow = () => {
   let tray
@@ -84,7 +85,7 @@ const createWindow = () => {
       }
     ])
     tray = new Tray(trayIcon)
-    tray.setToolTip('Nook Desktop')
+    tray.setToolTip(playing)
     tray.setContextMenu(trayMenu)
     tray.addListener('click', show)
   }
@@ -129,6 +130,12 @@ const createWindow = () => {
     ])
   })
 
+  ipcMain.on('openOnStartup', (event, args) => {
+    app.setLoginItemSettings({
+      openAtLogin: args[0]
+    })
+  })
+
   ipcMain.on('toPlayer', (event, args) => {
     hiddenWin.webContents.send('toPlayer', args)
   })
@@ -152,6 +159,12 @@ const createWindow = () => {
 
     app.relaunch()
     app.exit()
+  })
+
+  ipcMain.on('playing', (event, args) => {
+    if (args[0]) playing = `Nook - playing ${args[0]} (${args[1]})!`
+    else playing = 'Nook - playing nothing!'
+    if (tray && !tray.isDestroyed()) tray.setToolTip(playing)
   })
 }
 
