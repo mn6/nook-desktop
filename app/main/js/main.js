@@ -577,6 +577,7 @@ const exec = () => {
 
   $('.settings #openOnStartup').on('change', (e) => {
     ipc.send('toPlayer', ['openOnStartup', e.target.checked])
+    setCooldown()
   })
 
   $('.settings #langSelect').on('change', (e) => {

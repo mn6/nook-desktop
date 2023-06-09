@@ -5,6 +5,7 @@
         "Added label when minimized to tray to view the current tune's game and name",
         "Fixed total download file count",
         "Added Italian translations (thanks albanobattistella!)",
+        "Added Open on startup option (thanks NoodleSushi!)",
         "Minor bug fixes"
     ],
     "1.0.9": [
