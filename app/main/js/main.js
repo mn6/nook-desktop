@@ -748,9 +748,9 @@ $(document).ready(() => {
     } else if (arg[0] === 'updateGame') {
       $('#gameSelect').val(arg[1])
     } else if (arg[0] === 'pause') {
-      let newPaused = arg[1] ?? true
+      const newPaused = arg[1] ?? true
       paused = newPaused
-      pause(newPause)
+      pause(newPaused)
     }
   })
 })

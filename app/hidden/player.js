@@ -354,7 +354,7 @@ const handleIpc = async (event, arg) => {
     pauseClicked(arg[0])
   } else if (command === 'togglePaused') {
     pauseClicked()
-    storage.set('paused', { paused: paused })
+    storage.set('paused', { paused })
     ipc.send('toWindow', ['pause', paused])
   } else if (command === 'pauseIfPlaying') {
     if (!paused) {

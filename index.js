@@ -172,7 +172,7 @@ const createWindow = () => {
   })
 
   ipcMain.on('playing', (event, args) => {
-    isPlaying = args[0] ? true : false
+    isPlaying = !!args[0]
     if (args[0]) playing = `Nook - playing ${args[0]} (${args[1]})!`
     else playing = 'Nook - playing nothing!'
     if (tray && !tray.isDestroyed()) {
