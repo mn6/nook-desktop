@@ -37,7 +37,7 @@ const replaceDataInit = {
   offlineKKFiles: 0,
   offlineFiles: 0,
   totalKKFiles: 193,
-  totalFiles: 294
+  totalFiles: 296
 }
 
 const replaceDataObs = {
