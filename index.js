@@ -27,6 +27,7 @@ const progress = (win, num) => {
 }
 
 let myWindow
+let isPlaying = false
 let playing = 'Nook - playing nothing!'
 
 const createWindow = () => {
@@ -56,10 +57,29 @@ const createWindow = () => {
     if (tray) tray.destroy()
   }
 
+  const toggleAudio = () => {
+    hiddenWin.webContents.send('toPlayer', ['togglePaused'])
+  }
+
   const exit = () => {
     if (tray) tray.destroy()
     app.exit()
   }
+
+  const generateTrayMenu = () => Menu.buildFromTemplate([
+    {
+      label: 'Show',
+      click: show
+    },
+    {
+      label: isPlaying ? 'Stop' : 'Play',
+      click: toggleAudio
+    },
+    {
+      label: 'Exit',
+      click: exit
+    }
+  ])
 
   const close = (event) => {
     if (tray) tray.destroy()
@@ -74,19 +94,9 @@ const createWindow = () => {
       os.platform() === 'darwin'
         ? nativeImage.createFromPath(path.join(assets, macTrayImage))
         : nativeImage.createFromPath(path.join(assets, trayImage))
-    const trayMenu = Menu.buildFromTemplate([
-      {
-        label: 'Exit',
-        click: exit
-      },
-      {
-        label: 'Show',
-        click: show
-      }
-    ])
     tray = new Tray(trayIcon)
     tray.setToolTip(playing)
-    tray.setContextMenu(trayMenu)
+    tray.setContextMenu(generateTrayMenu())
     tray.addListener('click', show)
   }
 
@@ -162,9 +172,13 @@ const createWindow = () => {
   })
 
   ipcMain.on('playing', (event, args) => {
+    isPlaying = !!args[0]
     if (args[0]) playing = `Nook - playing ${args[0]} (${args[1]})!`
     else playing = 'Nook - playing nothing!'
-    if (tray && !tray.isDestroyed()) tray.setToolTip(playing)
+    if (tray && !tray.isDestroyed()) {
+      tray.setToolTip(playing)
+      tray.setContextMenu(generateTrayMenu())
+    }
   })
 }
 

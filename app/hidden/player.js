@@ -150,8 +150,10 @@ const stopAudio = async (mode = 'sound') => {
   })
 }
 
-const pauseClicked = async () => {
-  if (!paused) {
+const pauseClicked = async (newPaused = null) => {
+  if (paused === newPaused) {
+    return 'done'
+  } else if (!paused) {
     paused = true
     await stopAudio('all')
     return 'done'
@@ -349,12 +351,16 @@ const handleIpc = async (event, arg) => {
     await playBeeps(arg[0])
   } else if (command === 'paused') {
     storage.set('paused', { paused: arg[0] })
+    pauseClicked(arg[0])
+  } else if (command === 'togglePaused') {
     pauseClicked()
+    storage.set('paused', { paused })
+    ipc.send('toWindow', ['pause', paused])
   } else if (command === 'pauseIfPlaying') {
     if (!paused) {
       storage.set('paused', { paused: true })
-      pauseClicked()
-      ipc.send('toWindow', ['pause'])
+      pauseClicked(true)
+      ipc.send('toWindow', ['pause', true])
     }
   } else if (command === 'downloadHourly') {
     await downloadHourly()
