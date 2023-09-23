@@ -11,7 +11,7 @@
     "release": "env-cmd electron-builder",
     "lint": "standard"
   },
-  "author": "mn6",
+  "author": "mn6 <mn6@users.noreply.github.com>",
   "license": "ISC",
   "build": {
     "extraResources": [
@@ -38,6 +38,15 @@
       "target": [
         "nsis-web"
       ]
+    },
+    "linux": {
+      "artifactName": "${name}.${ext}",
+      "icon": "build/icons/nook.icns",
+      "target": [
+        "AppImage",
+        "pacman"
+      ],
+      "category": "Audio;Music;Player;AudioVideo"
     }
   },
   "publish": {
