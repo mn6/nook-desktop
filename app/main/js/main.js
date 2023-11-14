@@ -19,7 +19,8 @@ const translations = {
   it: require('./i18n/Nook_Italian.json'),
   fr: require('./i18n/Nook_French.json'),
   cn: require('./i18n/Nook_Chinese.json'),
-  pl: require('./i18n/Nook_Polish.json')
+  pl: require('./i18n/Nook_Polish.json'),
+  by: require('./i18n/Nook_Belarus.json')
 }
 
 const changelog = require('../release-log.json')
@@ -185,6 +186,9 @@ const template = `
                 </option>
                 <option value="pl">
                     Polish/Polski (PL)
+                </option>
+                <option value="by">
+                    Belarussian/Беларуская (BY)
                 </option>
               </select>
           </label>
