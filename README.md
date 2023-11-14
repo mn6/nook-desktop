@@ -10,7 +10,7 @@
     <li>New slick interface</li>
     <li>New rain sounds (in-game, no-thunder)</li>
     <li>Town tunes (and customization)</li>
-    <li>Multilingual support (EN, ES, DE, IT, FR and CN for now)</li>
+    <li>Multilingual support (EN, ES, DE, IT, FR, PL, BY and CN for now)</li>
     <li>Offline mode</li>
     <li>Population growing snowy and cherry blossom themes</li>
     <li>New horizons rainy and snowy themes</li>
