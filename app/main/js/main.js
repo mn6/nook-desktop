@@ -20,7 +20,7 @@ const translations = {
   fr: require('./i18n/Nook_French.json'),
   cn: require('./i18n/Nook_Chinese.json'),
   pl: require('./i18n/Nook_Polish.json'),
-  by: require('./i18n/Nook_Belarus.json')
+  by: require('./i18n/Nook_Belarussian.json')
 }
 
 const changelog = require('../release-log.json')
