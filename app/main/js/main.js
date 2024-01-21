@@ -184,6 +184,12 @@ const template = `
                 <option value="cn">
                     Chinese/中文 (CN)
                 </option>
+                <option value="nl">
+                    Dutch/Nederlands (NL)
+                </option>
+                <option value="ro">
+                    Romanian/Limba Română (RO)
+                </option>
               </select>
           </label>
           <p class="offline" data-i18n="offline" role="heading" aria-level="2"></p>
